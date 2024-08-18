@@ -4,6 +4,9 @@ import 'package:http/http.dart' as http;
 import 'StudentFlow/dashboard_Student.dart';
 import 'dashboard_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+class IpStorage {
+  static String ipAddress = '192.168.61.228';
+}
 class Login extends StatefulWidget{
 
   @override
@@ -18,7 +21,7 @@ class LoginState extends State<Login>{
 
   Future<void> check() async{
     try {
-        String? uri = "http://192.168.216.112/flutter/login.php";
+        String? uri = "http://${IpStorage.ipAddress}/flutter/login.php";
         var res = await http.post(Uri.parse(uri), body: {
           "name": email.text,
           "pwd": password.text

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dreamclass/dashboard_teacher.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'login.dart';
 
 class Addsubject extends StatefulWidget {
   @override
@@ -17,7 +18,7 @@ class AddsubjectState extends State<Addsubject> {
 
 
   Future<void> getCourseData() async {
-    String uri = "http://192.168.216.112/flutter/viewcourse.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
     var res = await http.post(Uri.parse(uri));
     var response = jsonDecode(res.body);
     setState(() {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dashboard_teacher.dart';
 import 'package:http/http.dart' as http;
+import 'login.dart';
 
 
 class AddCourse extends StatefulWidget {
@@ -23,7 +24,7 @@ class AddCourseState extends State<AddCourse> {
   TextEditingController activestatuscontroller  = TextEditingController();
   Future<void> addcourse() async{
     try{
-      String uri = "http://192.168.216.112/flutter/addcourse.php";
+      String uri = "http://${IpStorage.ipAddress}/flutter/addcourse.php";
        var res = await http.post(Uri.parse(uri),body: {
          "coursename" : coursenamecontroller.text,
          "coursefees" : coursefeescontroller.text,

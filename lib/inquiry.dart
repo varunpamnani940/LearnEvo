@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dashboard_teacher.dart';
+import 'login.dart';
 class Inquiry extends StatefulWidget{
   @override
   State<StatefulWidget> createState() {
@@ -15,7 +16,7 @@ class inquiryState extends State<Inquiry>{
   TextEditingController studname = TextEditingController();
   TextEditingController PhoneNumber = TextEditingController();
   Future<void> Uploadinquiry() async{
-    String uri = "http://192.168.216.112/flutter/inquiry.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/inquiry.php";
 
 
     var res =  await  http.post(Uri.parse(uri),body: {

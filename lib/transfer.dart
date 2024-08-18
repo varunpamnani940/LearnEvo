@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 
 import 'dashboard_teacher.dart';
 import 'EditStudent.dart';
+import 'login.dart';
 
 class transfer extends StatefulWidget {
   @override
@@ -22,7 +23,7 @@ class transferState extends State<transfer> {
 
   Future<void> getData() async {
     try {
-      String uri = "http://192.168.216.112/flutter/viewcourse.php";
+      String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
       var res = await http.post(Uri.parse(uri), body: {});
       setState(() {
         CourseData = jsonDecode(res.body).cast<Map<String, dynamic>>();
@@ -37,7 +38,7 @@ class transferState extends State<transfer> {
   }
 
   Future<void> getstudentdata() async {
-    String uri = "http://192.168.216.112/flutter/getallstudentdata.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/getallstudentdata.php";
     var res = await http.post(Uri.parse(uri), body: {});
     setState(() {
       student = jsonDecode(res.body);

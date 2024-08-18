@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dreamclass/login.dart';
 
 import 'dashboard_Student.dart';
 
@@ -16,7 +17,7 @@ class _CourseState extends State<Coursedetail> {
   Future<void> getdata() async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
     String uri =
-        "http://192.168.216.112/flutter/StudentFlowapis/getcoursedata.php";
+        "http://${IpStorage.ipAddress}/flutter/StudentFlowapis/getcoursedata.php";
     var res = await http
         .post(Uri.parse(uri), body: {"studentid": sp.getString("studentid")});
     setState(() {

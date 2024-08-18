@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'AddCourse.dart';
 import 'package:http/http.dart' as http;
+import 'login.dart';
 
 class AviableCourse extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class AviableCourseState extends State<AviableCourse> {
   List CourseData = [];
   Future<void> getData() async {
     try {
-      String uri = "http://192.168.216.112/flutter/viewcourse.php";
+      String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
       var res = await http.post(Uri.parse(uri), body: {});
       setState(() {
         CourseData = jsonDecode(res.body);
@@ -26,7 +27,7 @@ class AviableCourseState extends State<AviableCourse> {
   }
 Future<void> changestatus (a) async{
     try{
-      String uri = "http://192.168.216.112/flutter/deletecourse.php";
+      String uri = "http://${IpStorage.ipAddress}/flutter/deletecourse.php";
       var res = await http.post(Uri.parse(uri), body: {
         "inactive":a
       });

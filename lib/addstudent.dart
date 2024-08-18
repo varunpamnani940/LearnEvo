@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dashboard_teacher.dart';
 import 'package:http/http.dart' as http;
+import 'login.dart';
 
 class AddStudent extends StatefulWidget {
   @override
@@ -47,7 +48,7 @@ class AddStudentState extends State<AddStudent> {
   }
 
   Future<void> getcourse() async {
-    String uri = "http://192.168.216.112/flutter/viewcourse.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
     var res = await http.post(Uri.parse(uri), body: {});
     CourseData = jsonDecode(res.body);
     setState(() {
@@ -56,7 +57,7 @@ class AddStudentState extends State<AddStudent> {
     });
   }
   Future<void> uploadData() async{
-    String uri = "http://192.168.216.112/flutter/addstudent.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/addstudent.php";
     print(SelectedCollage);
     print(SelectedCourse);
     var res = await http.post(Uri.parse(uri),body: {

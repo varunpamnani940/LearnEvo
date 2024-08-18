@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +32,7 @@ class AddNotesState extends State<AddNotes> {
 
   }
   Future<void > uploadNotes() async {
-    String uri = "http://192.168.216.112/flutter/addnotes.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/addnotes.php";
     var respone = await http.post(Uri.parse(uri),body: {
       "courseid" : selectItem,
       "link" : link.text,
@@ -48,7 +48,7 @@ class AddNotesState extends State<AddNotes> {
     print(res);
   }
   Future<void> getSubjectData() async{
-    String uri = "http://192.168.216.112/flutter/viewsubject.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/viewsubject.php";
     var res =  await http.post(Uri.parse(uri));
 
 

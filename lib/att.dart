@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'att_2.dart';
 import 'dashboard_teacher.dart';
 import 'machine_Att_upload.dart';
+import 'login.dart';
 
 class att extends StatefulWidget {
   @override
@@ -31,7 +32,7 @@ class attState extends State<att> {
   }
 
   Future<void> getcourse() async {
-    String uri = "http://192.168.216.112/flutter/viewcourse.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
     var res = await http.post(Uri.parse(uri), body: {});
     setState(() {
       CourseData = jsonDecode(res.body);

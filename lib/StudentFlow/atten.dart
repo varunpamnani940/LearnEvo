@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:dreamclass/login.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
@@ -87,7 +87,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
   DateTime _focusedDate = DateTime.now();
   Future<void> getdata() async{
     final SharedPreferences studentid  = await SharedPreferences.getInstance();
-    String uri = "http://192.168.216.112/flutter/StudentFlowapis/getattendence.php";
+    String uri = "http://${IpStorage.ipAddress}/flutter/StudentFlowapis/getattendence.php";
     var res =  await http.post(Uri.parse(uri),body: {
       "studentid":studentid.getString("studentid")
     });

@@ -10,7 +10,7 @@ class notesstate extends State<notes>{
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: ,
+
     );
   }
 
