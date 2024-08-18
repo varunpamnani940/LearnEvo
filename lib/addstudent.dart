@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dashboard_teacher.dart';
 import 'package:http/http.dart' as http;
@@ -20,9 +21,24 @@ class AddStudentState extends State<AddStudent> {
   TextEditingController email = TextEditingController();
   TextEditingController adh = TextEditingController();
   TextEditingController ppno = TextEditingController();
+  TextEditingController password = TextEditingController();
+  TextEditingController  cardid = TextEditingController();
+  List card = [];
+  String Card_uid = "";
 
+  Future<void> getcard() async{
+    String  uri = "http://192.168.216.112/flutter/studentcard.php";
+    var res = await http.post(Uri.parse(uri));
+    setState(() {
+      card = jsonDecode(res.body);
+      Card_uid  = card[0];
+      print(Card_uid);
+
+
+    });
+  }
   Future<void> getcollageid() async {
-    String uri = "http://192.168.192.112/flutter/viewcollage.php";
+    String uri = "http://192.168.216.112/flutter/viewcollage.php";
     var res = await http.post(Uri.parse(uri), body: {});
     collagedata = jsonDecode(res.body);
     setState(() {
@@ -31,25 +47,28 @@ class AddStudentState extends State<AddStudent> {
   }
 
   Future<void> getcourse() async {
-    String uri = "http://192.168.192.112/flutter/viewcourse.php";
+    String uri = "http://192.168.216.112/flutter/viewcourse.php";
     var res = await http.post(Uri.parse(uri), body: {});
     CourseData = jsonDecode(res.body);
     setState(() {
+      CourseData = jsonDecode(res.body);
       print(CourseData);
     });
   }
   Future<void> uploadData() async{
-    String uri = "http://192.168.192.112/flutter/addstudent.php";
+    String uri = "http://192.168.216.112/flutter/addstudent.php";
     print(SelectedCollage);
     print(SelectedCourse);
     var res = await http.post(Uri.parse(uri),body: {
       "name": name.text,
+      "password":password.text,
       "pnumber": pno.text,
       "email":email.text,
       "collageid": SelectedCollage,
       "adcard":adh.text,
       "ppno":ppno.text,
-      "coursename":SelectedCourse
+      "coursename":SelectedCourse,
+      "card" : cardid.text
     });
     var response = jsonDecode(res.body);
     if(response["recordInserted"]=="true"){
@@ -66,6 +85,7 @@ class AddStudentState extends State<AddStudent> {
   void initState() {
     getcollageid();
     getcourse();
+    getcard();
     super.initState();
   }
 
@@ -142,6 +162,33 @@ class AddStudentState extends State<AddStudent> {
                               controller: name,
                             ),
                           ),
+
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Colors.white)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.grey.shade400)),
+                                fillColor: Colors.grey.shade200,
+                                filled: true,
+                                hintText: "Card UID",
+                                prefixIcon: Icon(Icons.person_rounded),
+                              ),
+                             readOnly: true,
+                              controller: cardid,
+                              onTap: (){
+                               setState(() {
+                                 getcard();
+                                 cardid.text = Card_uid;
+                               });
+                              },
+                            ),
+                          ),
                           Padding(
                             padding: EdgeInsets.symmetric(
                                 horizontal: 20, vertical: 5),
@@ -182,9 +229,9 @@ class AddStudentState extends State<AddStudent> {
                           ),
                           Padding(
                             padding: EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 10),
+                                horizontal: 20, vertical: 10),
                             child: Container(
-                              padding: EdgeInsets.all(10),
+                              padding: EdgeInsets.all(5),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey,width: 1),
                                 borderRadius: BorderRadius.circular(20)
@@ -192,7 +239,7 @@ class AddStudentState extends State<AddStudent> {
                               child: DropdownButton(
                                 underline: SizedBox(),
                                 value: SelectedCollage,
-                                itemHeight: 50,
+
                                 hint: Text(
                                   "Select Collage",
                                   style: TextStyle(fontSize: 30),
@@ -216,9 +263,9 @@ class AddStudentState extends State<AddStudent> {
                             )
                           ),
                           Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                             child: Container(
-                              padding: EdgeInsets.all(10),
+                              padding: EdgeInsets.all(5),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey,width: 1),
                                 borderRadius: BorderRadius.circular(20)

@@ -1,9 +1,19 @@
 import 'package:dreamclass/AddCourse.dart';
+import 'package:dreamclass/DeviceManager.dart';
+import 'package:dreamclass/EditStudent.dart';
+import 'package:dreamclass/addnotes.dart';
 import 'package:dreamclass/addstudent.dart';
 import 'package:dreamclass/addsubject.dart';
+import 'package:dreamclass/transfer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+import 'Availablestudent.dart';
+import 'att.dart';
+import 'inquiry.dart';
+import 'main.dart';
 
 class TeacherDashboard extends StatefulWidget {
   @override
@@ -30,6 +40,9 @@ class TeacherDashboardState extends State<TeacherDashboard> {
           child: ListView(
             padding: EdgeInsets.zero,
             children: [
+              const EndDrawerButton(
+
+              ),
               DrawerHeader(
                   child: Padding(
                 padding: EdgeInsets.zero,
@@ -80,7 +93,21 @@ class TeacherDashboardState extends State<TeacherDashboard> {
                   Navigator.pop(context); // Close the drawer
                   // Navigate to a screen related to Option 1 if needed
                 },
-              )
+              ),
+          ListTile(
+            leading: Icon(
+              Icons.logout_outlined,
+              color: Colors.white,
+            ),
+            title: const Text("Logout",
+                style: TextStyle(color: Colors.white)),
+            onTap: ()  async {
+            final  SharedPreferences Logut =  await SharedPreferences.getInstance();
+            Logut.remove("teacher");
+            Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>MyApp()));
+
+            },
+          ),
             ],
           ),
         ),
@@ -104,8 +131,8 @@ class TeacherDashboardState extends State<TeacherDashboard> {
           child: Stack(
             children: [
               Container(
-                width: 500,
-                height: 100,
+                width: MediaQuery.sizeOf(context).width,
+                height:  MediaQuery.sizeOf(context).height*0.2,
                 decoration: BoxDecoration(
                     borderRadius:
                         BorderRadius.only(bottomRight: Radius.circular(100)),
@@ -114,16 +141,16 @@ class TeacherDashboardState extends State<TeacherDashboard> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                  width: 500,
-                  height: 700,
+                  width: MediaQuery.sizeOf(context).width,
+                  height: MediaQuery.sizeOf(context).height*0.75,
                   decoration: BoxDecoration(color: Colors.blue[700]),
                 ),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
                 child: Container(
-                    width: 500,
-                    height: 700,
+                    width:  MediaQuery.sizeOf(context).width,
+                    height:  MediaQuery.sizeOf(context).height*0.75,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.only(
@@ -182,38 +209,40 @@ class HomeState extends State<Home> {
                   "“Memory is the treasury and guardian of all things.”",
                   style: TextStyle(fontWeight: FontWeight.w700),
                 ),
-                SizedBox(height: 10),
+                // SizedBox(height: MediaQuery.sizeOf(context).height*0.01),
                 Container(
-                  height: 200,
-                  width: 500,
+                  height: MediaQuery.sizeOf(context).height*0.2,
+                  width: MediaQuery.sizeOf(context).width,
                   child: PageView(
                     controller: _controller,
                     children: [
-                      ImageCard(),
-                      ImageCard(),
-                      ImageCard(),
-                      ImageCard(),
-                      ImageCard(),
-                      ImageCard(),
-                      ImageCard(),
+                      Expanded(child:  ImageCard("assets/images/first.jpg"),),
+                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
+                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
+                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
+                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
                     ],
                   ),
                 ),
-                SizedBox(height: 10),
+                SizedBox(height: MediaQuery.sizeOf(context).height*0.02),
                 SmoothPageIndicator(
                   controller: _controller,
-                  count: 7,
-                  effect: ExpandingDotsEffect(),
+                  count: 5,
+                  // effect: ExpandingDotsEffect(),
                 ),
-                SizedBox(height: 40),
-                Row(
-                  children: [
-                    ImageButtonHomeInquiry(),
-                    ImageButtonHomeAddUser(),
-                    ImageButtonHomeDelete(),
-                  ],
+                 SizedBox(height:  MediaQuery.sizeOf(context).height*0.04),
+                Container(
+                  // width: MediaQuery.sizeOf(context).width*0.001,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ImageButtonHomeInquiry(),
+                      ImageButtonHomeAddUser(),
+                      ImageButtonHomeDelete(),
+                    ],
+                  ),
                 ),
-                SizedBox(height: 40),
+                SizedBox(height:  MediaQuery.sizeOf(context).height*0.04),
                 Row(
                   children: [
                     ImageButtonHomeNotes(),
@@ -221,9 +250,6 @@ class HomeState extends State<Home> {
                     ImageButtonHomePerfomance(),
                   ],
                 ),
-
-
-
 
               ],
 
@@ -235,23 +261,42 @@ class HomeState extends State<Home> {
 }
 
 class ImageCard extends StatefulWidget {
+  String  imagelink1 = "";
+  ImageCard(String imagelink){
+    imagelink1  = imagelink;
+  }
+
   @override
   State<StatefulWidget> createState() {
-    return ImageCardState();
+    return ImageCardState(imagelink1);
   }
 }
 
 class ImageCardState extends State<ImageCard> {
+  String image = "";
+  ImageCardState(String imagelink){
+    image = imagelink;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 25),
       child: Container(
-        width: 500,
-        height: 200,
+        width: MediaQuery.sizeOf(context).width*0.5,
+        height:  MediaQuery.sizeOf(context).height*0.2,
+
         decoration: BoxDecoration(
-            color: Colors.blue[300], borderRadius: BorderRadius.circular(20)),
+          borderRadius: BorderRadius.circular(10.0),
+          image: DecorationImage(
+              image: AssetImage(image),
+              fit: BoxFit.cover),
+        ),
+
+        // child: Image.asset(image,height: 220,),
+
       ),
+
     );
   }
 }
@@ -265,16 +310,19 @@ class ImageButtonHomeInquiryState extends State<ImageButtonHomeInquiry>{
   @override
   Widget build(BuildContext context) {
     return Container(
+
         child: Material(
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> Inquiry()));
+            },
             child: Column(
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: CircleAvatar(
                     child: Image.asset("assets/images/inquiry.png"),
-                    radius: 55,
+                    radius: MediaQuery.sizeOf(context).width*0.12,
                   ),
                 ),
                 Text(
@@ -312,7 +360,7 @@ class ImageButtonHomeAddUserState extends State<ImageButtonHomeAddUser>{
                   child: CircleAvatar(
                     backgroundColor: Colors.pink,
                     child: Image.asset("assets/images/adduser.png"),
-                    radius: 55,
+                    radius: MediaQuery.sizeOf(context).width*0.12,
                   ),
                 ),
                 Text(
@@ -348,7 +396,7 @@ class ImageButtonHomeDeleteState extends State<ImageButtonHomeDelete>{
                   child: CircleAvatar(
 
                     child: Image.asset("assets/images/delete2.png"),
-                    radius: 55,
+                    radius: MediaQuery.sizeOf(context).width*0.12,
                   ),
                 ),
                 Text(
@@ -376,7 +424,9 @@ class ImageButtonHomeNotesState extends State<ImageButtonHomeNotes>{
     return Container(
         child: Material(
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>AddNotes()));
+            },
             child: Column(
               children: [
                 Padding(
@@ -384,7 +434,7 @@ class ImageButtonHomeNotesState extends State<ImageButtonHomeNotes>{
                   child: CircleAvatar(
 
                     child: Image.asset("assets/images/notes.png"),
-                    radius: 55,
+                    radius: MediaQuery.sizeOf(context).width*0.14,
                   ),
                 ),
                 Text(
@@ -421,7 +471,7 @@ class ImageButtonHomeAddState extends State<ImageButtonHomeAdd>{
                   child: CircleAvatar(
 
                     child: Image.asset("assets/images/add.png"),
-                    radius: 55,
+                    radius: MediaQuery.sizeOf(context).width*0.14,
                   ),
                 ),
                 Text(
@@ -456,7 +506,7 @@ class ImageButtonHomePerformanceState extends State<ImageButtonHomePerfomance>{
                   child: CircleAvatar(
 
                     child: Image.asset("assets/images/report.png"),
-                    radius: 55,
+                    radius: MediaQuery.sizeOf(context).width*0.14,
                   ),
                 ),
                 Text(
@@ -493,7 +543,7 @@ class ImageButtonAddsubjectstate extends State<ImageButtonAddsubject>{
                   child: CircleAvatar(
 
                     child: Image.asset("assets/images/addsub.png"),
-                    radius: 55,
+                    radius: MediaQuery.sizeOf(context).width*0.11,
                   ),
                 ),
                 Text(
@@ -527,16 +577,209 @@ class CategoriesState extends State<Categories>{
             
             children: [
               ImageButtonAddsubject(),
-              ImageButtonHomePerfomance(),
-              ImageButtonHomePerfomance(),
+              ImageButtonResult(),
+              ImageButtonAttendence(),
             ],
-          )
-
+          ),
+           Row(
+             children: [
+               ImageButtonstudent(),
+               ImageButtondevice(),
+               ImageButtontransfer(),
+             ],
+           ),
          ],
        ),
      )
 
    );
   }
+}
+class ImageButtonResult extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return ImageButtonResultstate();
+  }
+}
+class ImageButtonResultstate extends State<ImageButtonResult>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> Addsubject()));
+            },
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: CircleAvatar(
 
+                    child: Image.asset("assets/images/result.png"),
+                    radius: 55,
+                  ),
+                ),
+                Text(
+                  "Result Upload",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 17),
+                )
+              ],
+            ),
+          ),
+        )
+    );
+  }
+}
+class ImageButtonAttendence extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return ImageButtonAttendencestate();
+  }
+}
+class ImageButtonAttendencestate extends State<ImageButtonAttendence>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> att()));
+            },
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: CircleAvatar(
+
+                    child: Image.asset("assets/images/att.png"),
+                    radius: 55,
+                  ),
+                ),
+                Text(
+                  " Att  Upload",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 17),
+                )
+              ],
+            ),
+          ),
+        )
+    );
+  }
+}
+class ImageButtonstudent extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return ImageButtonstudentstate();
+  }
+}
+class ImageButtonstudentstate extends State<ImageButtonstudent>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Material(
+          child: InkWell(
+            onTap: () {
+
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> Availablestudent()));
+            },
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: CircleAvatar(
+
+                    child: Image.asset("assets/images/student1.png"),
+                    radius: 55,
+                  ),
+                ),
+                Text(
+                  "Available Student",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 15),
+                )
+              ],
+            ),
+          ),
+        )
+    );
+  }
+}
+class ImageButtondevice extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return ImageButtondevicestate();
+  }
+}
+class ImageButtondevicestate extends State<ImageButtondevice>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Material(
+          child: InkWell(
+            onTap: () {
+
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> DeviceManager()));
+            },
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: CircleAvatar(
+
+                    child: Image.asset("assets/images/device1.png"),
+                    radius: 55,
+                  ),
+                ),
+                Text(
+                  "Device Manager",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 17),
+                )
+              ],
+            ),
+          ),
+        )
+    );
+  }
+}
+class ImageButtontransfer extends StatefulWidget{
+  @override
+  State<StatefulWidget> createState() {
+    return ImageButtontransferstate();
+  }
+}
+class ImageButtontransferstate extends State<ImageButtontransfer>{
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        child: Material(
+          child: InkWell(
+            onTap: () {
+
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> transfer()));
+            },
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 10),
+                  child: CircleAvatar(
+
+                    child: Image.asset("assets/images/device1.png"),
+                    radius: 55,
+                  ),
+                ),
+                Text(
+                  "Device Manager",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 17),
+                )
+              ],
+            ),
+          ),
+        )
+    );
+  }
 }

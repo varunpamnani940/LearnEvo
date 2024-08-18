@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'StudentFlow/dashboard_Student.dart';
 import 'dashboard_teacher.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class Login extends StatefulWidget{
 
   @override
@@ -15,32 +17,40 @@ class LoginState extends State<Login>{
   TextEditingController password = TextEditingController();
 
   Future<void> check() async{
-
-
-      try {
-        String? uri = "http://192.168.192.112/flutter/login.php";
+    try {
+        String? uri = "http://192.168.216.112/flutter/login.php";
         var res = await http.post(Uri.parse(uri), body: {
           "name": email.text,
           "pwd": password.text
         });
         var response = jsonDecode(res.body);
         print(response);
-        if (response['valid']  == "true") {
+        if (response['admin'] == "true") {
+          final SharedPreferences  sp = await SharedPreferences.getInstance();
+          sp.setString("teacher",email.text);
           print("done");
           setState(() {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => TeacherDashboard()));
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => TeacherDashboard()));
+          });
+        }
+        else if (response['student'] == "true") {
+          print("done");
+          final SharedPreferences  sp = await SharedPreferences.getInstance();
+          sp.setString("studentid",email.text);
+          setState(() {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => StudentDashboard()));
           });
         } else {
-          print("some issue");
           setState(() {
             a = false;
             var alert = new AlertDialog(
               content: Text("LoginID Or Password is incorrect"),
             );
-            showDialog(context: context, builder: (BuildContext context){
-                return alert;
+            showDialog(context: context, builder: (BuildContext context) {
+              return alert;
             });
-           
           });
         }
       }
@@ -60,8 +70,9 @@ class LoginState extends State<Login>{
           body: Stack(
             children: [
               Container(
-                width: 550,
-                height: 300,
+                alignment: Alignment.topCenter,
+                width: MediaQuery.sizeOf(context).width,
+                height: MediaQuery.sizeOf(context).height*0.50,
                 decoration: BoxDecoration(
                  borderRadius: BorderRadius.only(bottomRight: Radius.circular(140)),
                     color: Colors.blue[700]
@@ -77,8 +88,8 @@ class LoginState extends State<Login>{
              Align(
                alignment: Alignment.bottomCenter,
                 child:  Container(
-                  width: 550,
-                  height: 600,
+                  width:  MediaQuery.sizeOf(context).width,
+                  height: MediaQuery.sizeOf(context).height*0.55,
                   decoration: BoxDecoration(
                       color: Colors.blue[700]
                   ),
@@ -87,21 +98,15 @@ class LoginState extends State<Login>{
               Align(
                 alignment: Alignment.bottomCenter,
                 child:  Container(
-                  width: 550,
-                  height: 600,
+                  width: MediaQuery.sizeOf(context).width,
+                  height: MediaQuery.sizeOf(context).height*0.55,
                   decoration: BoxDecoration(
                       color: Colors.white,
                     borderRadius: BorderRadius.only(topLeft: Radius.circular(140))
                   ),
                   child: Column(
                     children: [
-                      Padding(padding: EdgeInsets.only(top: 90,right: 250),
-                      child: Text("",style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600
-                      ),
-                      ),
-                      ),
+                      SizedBox(height: MediaQuery.sizeOf(context).height*0.04),
                       Padding(padding: EdgeInsets.symmetric(horizontal: 50),
                       child: TextField(
                         decoration: InputDecoration(
@@ -119,7 +124,7 @@ class LoginState extends State<Login>{
 
                       ),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: MediaQuery.sizeOf(context).height*0.03),
                       Padding(padding: EdgeInsets.symmetric(horizontal: 50),
                         child: TextField(
                           decoration: InputDecoration(
@@ -138,12 +143,12 @@ class LoginState extends State<Login>{
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Padding(padding: EdgeInsets.only(right: 50,top: 10),
+                          Padding(padding: EdgeInsets.only(right: 30,top: 10),
                           child: Text("ForgetPassword?"),
                           )
                         ],
                       ),
-                      SizedBox(height: 50),
+                      SizedBox(height: MediaQuery.sizeOf(context).height*0.03),
                       Material(
                         color: Colors.blue[700],
                         borderRadius: BorderRadius.circular(20),
@@ -174,7 +179,7 @@ class LoginState extends State<Login>{
                           child: Container(
                             child: Padding(
                               padding: EdgeInsets.symmetric(horizontal: 50 ,vertical: 10),
-                              child: Icon(Icons.login_rounded,color: Colors.white,size: 60,)
+                              child: Icon(Icons.login_rounded,color: Colors.white,size: 40,)
                               ),
                             ),
                           ),

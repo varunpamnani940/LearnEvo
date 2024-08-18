@@ -15,13 +15,15 @@ class AddCourse extends StatefulWidget {
 }
 
 class AddCourseState extends State<AddCourse> {
+  String? Active;
+  String Drop = "Active";
   @override
   TextEditingController coursenamecontroller  = TextEditingController();
   TextEditingController coursefeescontroller  = TextEditingController();
   TextEditingController activestatuscontroller  = TextEditingController();
   Future<void> addcourse() async{
     try{
-      String uri = "http://192.168.192.112/flutter/addcourse.php";
+      String uri = "http://192.168.216.112/flutter/addcourse.php";
        var res = await http.post(Uri.parse(uri),body: {
          "coursename" : coursenamecontroller.text,
          "coursefees" : coursefeescontroller.text,
@@ -128,22 +130,38 @@ class AddCourseState extends State<AddCourse> {
                             controller:  coursefeescontroller ,
 
                           ),),
-                        Padding(padding: EdgeInsets.symmetric(horizontal: 20,vertical: 10),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                  borderSide: BorderSide(color: Colors.white)),
-                              focusedBorder: OutlineInputBorder(
-                                  borderSide:
-                                  BorderSide(color: Colors.grey.shade400)),
-                              fillColor: Colors.grey.shade200,
-                              filled: true,
-                              hintText: "Active Status",
-                              prefixIcon: Icon(Icons.ad_units),
+                        SizedBox(height: 10,),
+                        Padding(padding: EdgeInsets.symmetric(horizontal: 20),
+                          child:  Container(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey,width: 1),
+                                borderRadius: BorderRadius.all(Radius.circular(20))
                             ),
-                            controller:  activestatuscontroller ,
+                            child: DropdownButton(
+                                isExpanded: true,
+                                value: Active,
+                                hint: Text("Select  Status for Course"),
+                                items: [
+                                  DropdownMenuItem(
+                                    child: Text("Active"),
+                                    value: "1",
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Text("Inactive"),
+                                    value: "0",
+                                  ),
 
-                          ),),
+                                ],
+                                onChanged: (newvalue ){
+                                  setState(() {
+                                    Active = newvalue.toString();
+                                  });
+                                }
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 20,),
                         Material(
                           color: Colors.blue[700],
                           borderRadius: BorderRadius.circular(10),

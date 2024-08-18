@@ -17,7 +17,7 @@ class AddsubjectState extends State<Addsubject> {
 
 
   Future<void> getCourseData() async {
-    String uri = "http:// 192.168.192.112/flutter/viewcourse.php";
+    String uri = "http://192.168.216.112/flutter/viewcourse.php";
     var res = await http.post(Uri.parse(uri));
     var response = jsonDecode(res.body);
     setState(() {
@@ -27,7 +27,7 @@ class AddsubjectState extends State<Addsubject> {
     });
   }
   Future<void> uploadSubjectData() async{
-    String uri = "http:// 192.168.192.112/flutter/addsubject.php";
+    String uri = "http://192.168.216.112/flutter/addsubject.php";
      var res = await http.post(Uri.parse(uri),body: {
        "cid" : SelectCourse,
        "subjectname" : subjectName.text
@@ -131,7 +131,8 @@ class AddsubjectState extends State<Addsubject> {
                           enabledBorder:
                           OutlineInputBorder(borderSide: BorderSide(color: Colors.white)),
                           focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.grey.shade400)),
+                              borderSide: BorderSide(color: Colors.grey.shade400)
+                          ),
                           fillColor: Colors.grey.shade200,
                           filled: true,
                           hintText: "Subject Name",
