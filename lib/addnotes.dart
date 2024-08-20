@@ -20,7 +20,7 @@ class AddNotesState extends State<AddNotes> {
   TextEditingController link = TextEditingController();
   String? selectSubject;
   Future<void> getCourseData() async{
-    String uri = "http://192.168.216.112/flutter/viewcourse.php";
+    String uri = "http://$ipAddress/flutter/viewcourse.php";
     var res =  await http.post(Uri.parse(uri));
 
 
@@ -32,7 +32,7 @@ class AddNotesState extends State<AddNotes> {
 
   }
   Future<void > uploadNotes() async {
-    String uri = "http://${IpStorage.ipAddress}/flutter/addnotes.php";
+    String uri = "http://$ipAddress/flutter/addnotes.php";
     var respone = await http.post(Uri.parse(uri),body: {
       "courseid" : selectItem,
       "link" : link.text,
@@ -48,13 +48,15 @@ class AddNotesState extends State<AddNotes> {
     print(res);
   }
   Future<void> getSubjectData() async{
-    String uri = "http://${IpStorage.ipAddress}/flutter/viewsubject.php";
-    var res =  await http.post(Uri.parse(uri));
+    String uri = "http://$ipAddress/flutter/viewsubject.php";
+    var res =  await http.post(Uri.parse(uri),body: {
+      "courseod":selectItem
+
+    });
 
 
     setState(() {
       SubjectData = jsonDecode(res.body);
-
       print(SubjectData);
     });
 
@@ -64,7 +66,7 @@ class AddNotesState extends State<AddNotes> {
     super.initState();
     // TODO: implement initState
     getCourseData();
-    getSubjectData();
+
   }
   @override
   Widget build(BuildContext context) {
@@ -140,6 +142,7 @@ class AddNotesState extends State<AddNotes> {
                            onChanged: (newvalue ){
                              setState(() {
                                selectItem = newvalue.toString();
+                               getSubjectData();
                              });
                            }
                        ),

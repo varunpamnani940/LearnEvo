@@ -195,7 +195,6 @@ class Home extends StatefulWidget {
     return HomeState();
   }
 }
-
 class HomeState extends State<Home> {
   final _controller = PageController();
   @override
@@ -216,11 +215,11 @@ class HomeState extends State<Home> {
                   child: PageView(
                     controller: _controller,
                     children: [
-                      Expanded(child:  ImageCard("assets/images/first.jpg"),),
-                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
-                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
-                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
-                      Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
+                      Expanded(child:  ImageCard("assets/images/4.jpg"),),
+                      Expanded(child:  ImageCard("assets/images/2.jpg"),),
+                      Expanded(child:  ImageCard("assets/images/3.jpg"),),
+                      Expanded(child:  ImageCard("assets/images/4.jpg"),),
+                      Expanded(child:  ImageCard("assets/images/5.jpg"),),
                     ],
                   ),
                 ),
@@ -277,7 +276,6 @@ class ImageCardState extends State<ImageCard> {
   ImageCardState(String imagelink){
     image = imagelink;
   }
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -615,7 +613,6 @@ class ImageButtonResultstate extends State<ImageButtonResult>{
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: CircleAvatar(
-
                     child: Image.asset("assets/images/result.png"),
                     radius: 55,
                   ),
@@ -759,7 +756,7 @@ class ImageButtontransferstate extends State<ImageButtontransfer>{
           child: InkWell(
             onTap: () {
 
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> transfer()));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> Transfer()));
             },
             child: Column(
               children: [
@@ -767,12 +764,12 @@ class ImageButtontransferstate extends State<ImageButtontransfer>{
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: CircleAvatar(
 
-                    child: Image.asset("assets/images/device1.png"),
+                    child: Icon(Icons.transform,size: 70,),
                     radius: 55,
                   ),
                 ),
                 Text(
-                  "Device Manager",
+                  "Trasnfer",
                   style: TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 17),
                 )

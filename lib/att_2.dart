@@ -36,7 +36,7 @@ class att_2State extends State<att_2> {
 
 
   Future<void> GetStudentData() async{
-    String uri = "http://${IpStorage.ipAddress}/flutter/getstudentdata.php";
+    String uri = "http://$ipAddress/flutter/getstudentdata.php";
     var res = await http.post(Uri.parse(uri),body: {
       "courseid" : Courseid
     }) ;
@@ -52,7 +52,7 @@ class att_2State extends State<att_2> {
   Codec<String, String> stringToBase64 = utf8.fuse(base64);
   Future<void> uploadAttendence () async{
 
-    String  uri = "http://${IpStorage.ipAddress}/flutter/uploadattendence.php";
+    String  uri = "http://$ipAddress/flutter/uploadattendence.php";
     var res = await http.post(Uri.parse(uri), body: {
      "absentarray":encoded_absentids,
       "studentdata":encoded_studentis,

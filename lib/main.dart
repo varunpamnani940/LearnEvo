@@ -45,13 +45,13 @@ class _MyHomePageState extends State<MyHomePage> {
     Timer(Duration(milliseconds: 1),
             ()=>getsudentid().whenComplete(() async{
             if(studid==null && tid ==null){
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>GetStarted()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>GetStarted()));
             }
             else if(studid == null){
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>TeacherDashboard()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>TeacherDashboard()));
             }
             else if(tid==null){
-              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>StudentDashboard()));
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>StudentDashboard()));
 
             }
             }),

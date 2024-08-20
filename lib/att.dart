@@ -32,7 +32,7 @@ class attState extends State<att> {
   }
 
   Future<void> getcourse() async {
-    String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
+    String uri = "http://${ipAddress}/flutter/viewcourse.php";
     var res = await http.post(Uri.parse(uri), body: {});
     setState(() {
       CourseData = jsonDecode(res.body);

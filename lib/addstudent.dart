@@ -24,11 +24,12 @@ class AddStudentState extends State<AddStudent> {
   TextEditingController ppno = TextEditingController();
   TextEditingController password = TextEditingController();
   TextEditingController  cardid = TextEditingController();
+  TextEditingController  discount = TextEditingController();
   List card = [];
   String Card_uid = "";
 
   Future<void> getcard() async{
-    String  uri = "http://192.168.216.112/flutter/studentcard.php";
+    String  uri = "http://$ipAddress/flutter/studentcard.php";
     var res = await http.post(Uri.parse(uri));
     setState(() {
       card = jsonDecode(res.body);
@@ -39,7 +40,7 @@ class AddStudentState extends State<AddStudent> {
     });
   }
   Future<void> getcollageid() async {
-    String uri = "http://192.168.216.112/flutter/viewcollage.php";
+    String uri = "http://$ipAddress/flutter/viewcollage.php";
     var res = await http.post(Uri.parse(uri), body: {});
     collagedata = jsonDecode(res.body);
     setState(() {
@@ -48,7 +49,7 @@ class AddStudentState extends State<AddStudent> {
   }
 
   Future<void> getcourse() async {
-    String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
+    String uri = "http://$ipAddress/flutter/viewcourse.php";
     var res = await http.post(Uri.parse(uri), body: {});
     CourseData = jsonDecode(res.body);
     setState(() {
@@ -57,7 +58,7 @@ class AddStudentState extends State<AddStudent> {
     });
   }
   Future<void> uploadData() async{
-    String uri = "http://${IpStorage.ipAddress}/flutter/addstudent.php";
+    String uri = "http://$ipAddress/flutter/addstudent.php";
     print(SelectedCollage);
     print(SelectedCourse);
     var res = await http.post(Uri.parse(uri),body: {
@@ -69,17 +70,19 @@ class AddStudentState extends State<AddStudent> {
       "adcard":adh.text,
       "ppno":ppno.text,
       "coursename":SelectedCourse,
-      "card" : cardid.text
+      "card" : cardid.text,
+      "dicsount":discount.text
     });
-    var response = jsonDecode(res.body);
-    if(response["recordInserted"]=="true"){
-      var alert = AlertDialog(
-        content: Text("Student Recored Inserted"),
-      );
-      showDialog(context: context, builder: (BuildContext context){
-        return alert;
-      });
-    }
+    // var response = jsonDecode(res.body);
+    // if(response["recordInserted"]=="true"){
+    //   var alert = AlertDialog(
+    //     content: Text("Student Recored Inserted"),
+    //   );
+    //   showDialog(context: context, builder: (BuildContext context){
+    //     return alert;
+    //   });
+    // }
+    print(res.body);
   }
 
   @override
@@ -334,6 +337,25 @@ class AddStudentState extends State<AddStudent> {
                                 prefixIcon: Icon(Icons.contact_page_outlined),
                               ),
                               controller: ppno,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 5),
+                            child: TextField(
+                              decoration: InputDecoration(
+                                enabledBorder: OutlineInputBorder(
+                                    borderSide:
+                                    BorderSide(color: Colors.white)),
+                                focusedBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(
+                                        color: Colors.grey.shade400)),
+                                fillColor: Colors.grey.shade200,
+                                filled: true,
+                                hintText: "Dicount",
+                                prefixIcon: Icon(Icons.contact_page_outlined),
+                              ),
+                              controller: discount,
                             ),
                           ),
                           SizedBox(height: 20,),

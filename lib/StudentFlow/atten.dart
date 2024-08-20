@@ -87,7 +87,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
   DateTime _focusedDate = DateTime.now();
   Future<void> getdata() async{
     final SharedPreferences studentid  = await SharedPreferences.getInstance();
-    String uri = "http://${IpStorage.ipAddress}/flutter/StudentFlowapis/getattendence.php";
+    String uri = "http://${ipAddress}/flutter/StudentFlowapis/getattendence.php";
     var res =  await http.post(Uri.parse(uri),body: {
       "studentid":studentid.getString("studentid")
     });

@@ -15,7 +15,7 @@ class AviableCourseState extends State<AviableCourse> {
   List CourseData = [];
   Future<void> getData() async {
     try {
-      String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
+      String uri = "http://$ipAddress/flutter/viewcourse.php";
       var res = await http.post(Uri.parse(uri), body: {});
       setState(() {
         CourseData = jsonDecode(res.body);
@@ -27,7 +27,7 @@ class AviableCourseState extends State<AviableCourse> {
   }
 Future<void> changestatus (a) async{
     try{
-      String uri = "http://${IpStorage.ipAddress}/flutter/deletecourse.php";
+      String uri = "http://$ipAddress/flutter/deletecourse.php";
       var res = await http.post(Uri.parse(uri), body: {
         "inactive":a
       });

@@ -16,7 +16,7 @@ class inquiryState extends State<Inquiry>{
   TextEditingController studname = TextEditingController();
   TextEditingController PhoneNumber = TextEditingController();
   Future<void> Uploadinquiry() async{
-    String uri = "http://${IpStorage.ipAddress}/flutter/inquiry.php";
+    String uri = "http://$ipAddress/flutter/inquiry.php";
 
 
     var res =  await  http.post(Uri.parse(uri),body: {
@@ -35,7 +35,7 @@ class inquiryState extends State<Inquiry>{
     }
   }
   Future<void> course() async{
-    String uri = "http://192.168.216.112/flutter/viewcourse.php";
+    String uri = "http://$ipAddress/flutter/viewcourse.php";
 
     var res =  await  http.post(Uri.parse(uri));
     var r = jsonDecode(res.body);

@@ -23,7 +23,7 @@ class AvailablestudentState extends State<Availablestudent> {
 
   Future<void> getData() async {
     try {
-      String uri = "http://${IpStorage.ipAddress}/flutter/viewcourse.php";
+      String uri = "http://$ipAddress/flutter/viewcourse.php";
       var res = await http.post(Uri.parse(uri), body: {});
       setState(() {
         CourseData = jsonDecode(res.body).cast<Map<String, dynamic>>();
@@ -38,7 +38,7 @@ class AvailablestudentState extends State<Availablestudent> {
   }
 
   Future<void> getstudentdata() async {
-    String uri = "http://${IpStorage.ipAddress}/flutter/getallstudentdata.php";
+    String uri = "http://$ipAddress/flutter/getallstudentdata.php";
     var res = await http.post(Uri.parse(uri), body: {});
     setState(() {
       student = jsonDecode(res.body);

@@ -17,7 +17,7 @@ class _CourseState extends State<Coursedetail> {
   Future<void> getdata() async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
     String uri =
-        "http://${IpStorage.ipAddress}/flutter/StudentFlowapis/getcoursedata.php";
+        "http://${ipAddress}/flutter/StudentFlowapis/getcoursedata.php";
     var res = await http
         .post(Uri.parse(uri), body: {"studentid": sp.getString("studentid")});
     setState(() {

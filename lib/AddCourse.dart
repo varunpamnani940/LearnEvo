@@ -24,7 +24,7 @@ class AddCourseState extends State<AddCourse> {
   TextEditingController activestatuscontroller  = TextEditingController();
   Future<void> addcourse() async{
     try{
-      String uri = "http://${IpStorage.ipAddress}/flutter/addcourse.php";
+      String uri = "http://$ipAddress/flutter/addcourse.php";
        var res = await http.post(Uri.parse(uri),body: {
          "coursename" : coursenamecontroller.text,
          "coursefees" : coursefeescontroller.text,

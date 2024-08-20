@@ -29,7 +29,6 @@ class StudentDashboardState extends State<StudentDashboard> {
   List<Widget> bottomNavigationBarItems = [
     Home(),
     Icon(Icons.account_circle_rounded),
-    Categories(),
   ];
   @override
 
@@ -186,8 +185,6 @@ class StudentDashboardState extends State<StudentDashboard> {
             BottomNavigationBarItem(label: "Home", icon: Icon(Icons.home)),
             BottomNavigationBarItem(
                 label: "fee's", icon: Icon(Icons.monetization_on_outlined)),
-            BottomNavigationBarItem(
-                label: "Categories", icon: Icon(Icons.dashboard)),
           ],
         ),
       ),
@@ -205,10 +202,7 @@ class Home extends StatefulWidget {
   State<StatefulWidget> createState() {
     return HomeState();
   }
-
-
 }
-
 class HomeState extends State<Home> {
 
   final _controller = PageController();
@@ -230,11 +224,11 @@ class HomeState extends State<Home> {
                   child: PageView(
                     controller: _controller,
                     children: [
-                     Expanded(child:  ImageCard("assets/images/first.jpg"),),
-                     Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
-                     Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
-                     Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
-                     Expanded(child:  ImageCard("assets/imagesslider/2.jpeg"),),
+                     Expanded(child:  ImageCard("assets/images/1.jpg"),),
+                     Expanded(child:  ImageCard("assets/images/2.jpg"),),
+                     Expanded(child:  ImageCard("assets/images/3.jpg"),),
+                     Expanded(child:  ImageCard("assets/images/4.jpg"),),
+                     Expanded(child:  ImageCard("assets/images/5.jpg"),),
                     ],
                   ),
                 ),
