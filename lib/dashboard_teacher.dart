@@ -12,6 +12,7 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import 'Availablestudent.dart';
 import 'att.dart';
+import 'fees.dart';
 import 'inquiry.dart';
 import 'main.dart';
 
@@ -21,12 +22,11 @@ class TeacherDashboard extends StatefulWidget {
     return TeacherDashboardState();
   }
 }
-
 class TeacherDashboardState extends State<TeacherDashboard> {
   int _current_Index = 0;
   List<Widget> bottomNavigationBarItems = [
     Home(),
-    Icon(Icons.account_circle_rounded),
+    Fees(),
     Categories(),
   ];
   @override
@@ -157,15 +157,12 @@ class TeacherDashboardState extends State<TeacherDashboard> {
                           topLeft: Radius.circular(100),
                           topRight: Radius.circular(100)),
                     ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 25),
-                        Container(
+                    child: Container(
                           child: bottomNavigationBarItems[_current_Index],
                         )
-                      ],
+
                     )),
-              ),
+
             ],
           ),
         ),
@@ -177,6 +174,7 @@ class TeacherDashboardState extends State<TeacherDashboard> {
             });
           },
           items: [
+
             BottomNavigationBarItem(label: "Home", icon: Icon(Icons.home)),
             BottomNavigationBarItem(
                 label: "fee's", icon: Icon(Icons.monetization_on_outlined)),
@@ -204,6 +202,7 @@ class HomeState extends State<Home> {
           child: Container(
             child: Column(
               children: [
+                SizedBox(height: 25,),
                 Text(
                   "“Memory is the treasury and guardian of all things.”",
                   style: TextStyle(fontWeight: FontWeight.w700),
