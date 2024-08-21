@@ -174,7 +174,6 @@ class TeacherDashboardState extends State<TeacherDashboard> {
             });
           },
           items: [
-
             BottomNavigationBarItem(label: "Home", icon: Icon(Icons.home)),
             BottomNavigationBarItem(
                 label: "fee's", icon: Icon(Icons.monetization_on_outlined)),
