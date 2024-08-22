@@ -2,6 +2,9 @@ import 'dart:convert';
 import 'package:dreamclass/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'feesstudent.dart';
 
 class Fees extends StatefulWidget {
   @override
@@ -113,6 +116,10 @@ class FeesState extends State<Fees> {
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
+                            onTap: () {
+                              print(courseTotalsList[index]["courseName"]);
+                              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>feesstud(courseTotalsList[index]["courseName"])));
+                            },
                             title: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,

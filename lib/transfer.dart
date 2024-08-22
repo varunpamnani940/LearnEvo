@@ -66,17 +66,24 @@ class TransferState extends State<Transfer> {
       print(e);
     }
   }
-
+  bool isLoading = true;
   Future<void> getStudentData() async {
+    setState(() {
+      isLoading = true; // Start loading
+    });
     try {
       String uri = "http://${ipAddress}/flutter/getallstudentdata.php";
       var res = await http.post(Uri.parse(uri), body: {});
       setState(() {
         student = jsonDecode(res.body);
         filteredStudents = student;
+        isLoading = false; // Stop loading once data is fetched
         print(student);
       });
     } catch (e) {
+      setState(() {
+        isLoading = false; // Stop loading in case of an error
+      });
       print(e);
     }
   }
@@ -180,7 +187,9 @@ class TransferState extends State<Transfer> {
             ),
           ),
         ),
-        body: SingleChildScrollView(
+        body: isLoading // Show CircularProgressIndicator if loading
+            ? Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
           child: Stack(
             children: [
               Container(
@@ -201,13 +210,13 @@ class TransferState extends State<Transfer> {
                 child: Column(
                   children: [
                     // Search Bar
-
                     // DropDown Buttons in a Row
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 10.0, horizontal: 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        mainAxisAlignment:
+                        MainAxisAlignment.spaceEvenly,
                         children: [
                           Expanded(
                             child: DropdownButton<String>(
@@ -219,13 +228,14 @@ class TransferState extends State<Transfer> {
                                 });
                               },
                               underline: SizedBox(),
-                              items: courseNames.map<DropdownMenuItem<String>>((
-                                  courseName) {
-                                return DropdownMenuItem<String>(
-                                  value: courseName,
-                                  child: Text(courseName),
-                                );
-                              }).toList(),
+                              items: courseNames
+                                  .map<DropdownMenuItem<String>>(
+                                      (courseName) {
+                                    return DropdownMenuItem<String>(
+                                      value: courseName,
+                                      child: Text(courseName),
+                                    );
+                                  }).toList(),
                               isExpanded: true,
                               hint: Text("From "),
                             ),
@@ -267,10 +277,8 @@ class TransferState extends State<Transfer> {
                       shrinkWrap: true, // Disable scrolling for the ListView
                       itemCount: filteredStudents.length,
                       itemBuilder: (context, index) {
-                        int studentId = int.parse(
-                            filteredStudents[index]['studentid'].toString());
-                        bool isChecked = !uncheckedStudents.containsKey(
-                            studentId);
+                        int studentId = int.parse(filteredStudents[index]['studentid'].toString());
+                        bool isChecked = !uncheckedStudents.containsKey(studentId);
 
                         return Padding(
                           padding: EdgeInsets.all(5.0),
@@ -292,7 +300,6 @@ class TransferState extends State<Transfer> {
                                   print(ids);
                                   enocdedids = base64Url.encode(utf8.encode(ids.toString()));
                                   print(enocdedids);
-
                                 });
                               },
                             ),
@@ -305,9 +312,6 @@ class TransferState extends State<Transfer> {
                             ),
                             subtitle: Text(
                                 filteredStudents[index]["coursename"]),
-                            onTap: () {
-                              // Implement onTap action
-                            },
                           ),
                         );
                       },
@@ -319,7 +323,6 @@ class TransferState extends State<Transfer> {
           ),
         ),
       ),
-
     );
   }
 
@@ -365,7 +368,6 @@ class TransferState extends State<Transfer> {
               onPressed: () {
                 upload();
                 // Implement your upload functionality here
-
               },
               child: Text("Upload"),
             ),
@@ -374,10 +376,9 @@ class TransferState extends State<Transfer> {
       },
     );
   }
+
   void uploadCheckedStudents(List checkedStudents) {
     // Implement your logic to upload the checked students
-    // This could involve sending the data to a server, saving it locally, etc.
-    // For now, let's just print the checked students:
     print("Uploading the following students:");
     checkedStudents.forEach((student) {
       print(student["studentname"]);
