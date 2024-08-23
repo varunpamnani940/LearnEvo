@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class feesstud extends StatefulWidget {
-  String? CourseName ;
+  String? CourseName;
   @override
   State<StatefulWidget> createState() {
     return feesstudstate(CourseName);
@@ -13,14 +13,22 @@ class feesstud extends StatefulWidget {
 
   feesstud(this.CourseName);
 }
+
 List student = [];
+
 class feesstudstate extends State<feesstud> {
   String? Coursename;
+  TextEditingController _feesController = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
+  String _selectedPaymentMode = "Cash"; // Default value for payment mode
+  List<String> paymentModes = ["Cash", "Cheque", "Online"]; // List of payment modes
+
   feesstudstate(this.Coursename);
-  Future<void> getdata() async{
+
+  Future<void> getdata() async {
     String uri = "http://$ipAddress/flutter/getcoursefeesdata.php";
-    var res = await http.post(Uri.parse(uri),body: {
-      "coursename":Coursename
+    var res = await http.post(Uri.parse(uri), body: {
+      "coursename": Coursename
     });
     setState(() {
       print(res.body);
@@ -32,6 +40,94 @@ class feesstudstate extends State<feesstud> {
   void initState() {
     super.initState();
     getdata();
+  }
+
+  // Function to show the dialog
+  void showAddFeesDialog(int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Add Fees Payment"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextFormField(
+                controller: _feesController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Amount Paid",
+                ),
+              ),
+              TextFormField(
+                controller: _dateController,
+                decoration: InputDecoration(
+                  labelText: "Date",
+                ),
+                onTap: () async {
+                  DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101),
+                  );
+                  if (pickedDate != null) {
+                    setState(() {
+                      _dateController.text =
+                      "${pickedDate.year}-${pickedDate.month}-${pickedDate.day}";
+                    });
+                  }
+                },
+              ),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: "Payment Mode",
+                ),
+                value: _selectedPaymentMode,
+                items: paymentModes.map((String mode) {
+                  return DropdownMenuItem<String>(
+                    value: mode,
+                    child: Text(mode),
+                  );
+                }).toList(),
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedPaymentMode = newValue!;
+                  });
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Here you can send the updated fees, date, and payment mode to the server
+                String paidFees = _feesController.text;
+                String paidDate = _dateController.text;
+                String paymentMode = _selectedPaymentMode;
+                print("Student ID: ${student[index]["receiableid"]}");
+                print("Paid Fees: $paidFees");
+                print("Date: $paidDate");
+                print("Payment Mode: $paymentMode");
+
+                // Reset the input fields
+                _feesController.clear();
+                _dateController.clear();
+
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text("Submit"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -69,7 +165,7 @@ class feesstudstate extends State<feesstud> {
                         return Card(
                           child: ListTile(
                             onTap: () {
-                              print(student[index]["studentname"]);
+                              showAddFeesDialog(index);
                             },
                             title: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -91,7 +187,7 @@ class feesstudstate extends State<feesstud> {
                                 ),
                                 Row(
                                   children: [
-                                    Text(" Recieable Fees: "),
+                                    Text("Recieable Fees: "),
                                     Text(student[index]["receiablefees"]),
                                   ],
                                 ),
@@ -99,6 +195,13 @@ class feesstudstate extends State<feesstud> {
                                   children: [
                                     Text("Total Received Fees: "),
                                     Text(student[index]["receivedfees"]),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 60),
+                                      child: Icon(
+                                        Icons.add,
+                                        size: 50,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -116,6 +219,4 @@ class feesstudstate extends State<feesstud> {
       ),
     );
   }
-
-
 }
