@@ -105,8 +105,17 @@ class FeesState extends State<Fees> {
                   topLeft: Radius.circular(120),
                 ),
               ),
-              child: Column(
-                children: [
+              padding: EdgeInsets.all(25),
+              child: Column(children: [
+                SizedBox(height: 20,),
+              TextField(
+                decoration: InputDecoration(
+                    labelText: 'Search',
+                    suffixIcon: Icon(Icons.search)
+                ),
+              ),
+              SizedBox(height: 20,
+              ),
                   Expanded(
                     child: ListView.builder(
                       padding: EdgeInsets.all(40),
