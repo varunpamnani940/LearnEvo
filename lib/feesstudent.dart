@@ -24,7 +24,6 @@ class feesstudstate extends State<feesstud> {
   List<String> paymentModes = ["Cash", "Cheque", "Online"]; // List of payment modes
 
   feesstudstate(this.Coursename);
-
   Future<void> getdata() async {
     String uri = "http://$ipAddress/flutter/getcoursefeesdata.php";
     var res = await http.post(Uri.parse(uri), body: {
