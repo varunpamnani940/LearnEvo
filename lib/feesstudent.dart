@@ -6,12 +6,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class feesstud extends StatefulWidget {
   String? CourseName;
+
+  feesstud(this.CourseName);
+
   @override
   State<StatefulWidget> createState() {
     return feesstudstate(CourseName);
   }
-
-  feesstud(this.CourseName);
 }
 
 List student = [];
@@ -41,8 +42,67 @@ class feesstudstate extends State<feesstud> {
     super.initState();
     getdata();
   }
+  void show(int index){
+    showDialog(context: context, builder: (context){
+      return AlertDialog(
+        title: Text("Choose option"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0),
+                  child: Material(
+                    color: Colors.blue[700],
+                    borderRadius: BorderRadius.circular(10),
+                    child: InkWell(
+                      onTap: (){
+                        showAddFeesDialog(index);
+                      },
+                      child: Container(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
+                            child:  Text("Add New" , style: TextStyle(
+                                color: Colors.white,fontWeight: FontWeight.w700,fontSize: 15
+                            ),),
+                          )
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12.0,horizontal: 10),
+                  child: Material(
+                    color: Colors.blue[700],
+                    borderRadius: BorderRadius.circular(10),
+                    child: InkWell(
+                      onTap: (){
 
-  // Function to show the dialog
+                      },
+                      child: Container(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
+                            child:  Text("Payment History" , style: TextStyle(
+                                color: Colors.white,fontWeight: FontWeight.w700,fontSize: 15
+                            ),),
+
+
+                          )
+                      ),
+                    ),
+                  ),
+                ),
+
+              ],
+            )
+          ],
+        )
+      );
+    });
+  }
+
+  // Function to show the add fees dialog with improved error handling
   void showAddFeesDialog(int index) {
     showDialog(
       context: context,
@@ -100,25 +160,25 @@ class feesstudstate extends State<feesstud> {
           ),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
+              onPressed: () => Navigator.pop(context), // Close dialog
               child: Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                // Here you can send the updated fees, date, and payment mode to the server
                 String paidFees = _feesController.text;
                 String paidDate = _dateController.text;
                 String paymentMode = _selectedPaymentMode;
+
                 print("Student ID: ${student[index]["receiableid"]}");
                 print("Paid Fees: $paidFees");
                 print("Date: $paidDate");
                 print("Payment Mode: $paymentMode");
 
                 // Reset the input fields
-                _feesController.clear();
-                _dateController.clear();
+
+
+                // Send data to server (implement your server API call here)
+                // ...
 
                 Navigator.pop(context); // Close the dialog
               },
@@ -165,7 +225,7 @@ class feesstudstate extends State<feesstud> {
                         return Card(
                           child: ListTile(
                             onTap: () {
-                              showAddFeesDialog(index);
+                              show(index);
                             },
                             title: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
