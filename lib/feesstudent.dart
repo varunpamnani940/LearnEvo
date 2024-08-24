@@ -36,7 +36,6 @@ class feesstudstate extends State<feesstud> {
       student = jsonDecode(res.body);
     });
   }
-
   @override
   void initState() {
     super.initState();
