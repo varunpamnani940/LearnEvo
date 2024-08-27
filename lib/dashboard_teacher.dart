@@ -4,6 +4,7 @@ import 'package:dreamclass/EditStudent.dart';
 import 'package:dreamclass/addnotes.dart';
 import 'package:dreamclass/addstudent.dart';
 import 'package:dreamclass/addsubject.dart';
+import 'package:dreamclass/profile.dart';
 import 'package:dreamclass/transfer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -72,7 +73,7 @@ class TeacherDashboardState extends State<TeacherDashboard> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  // Navigator.push(context,MaterialPageRoute(builder: (context)=> profile())); // Close the drawer
+                   Navigator.push(context,MaterialPageRoute(builder: (context)=> profile())); // Close the drawer
                   // Navigate to a screen related to Option 1 if needed
                 },
               ),

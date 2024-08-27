@@ -11,8 +11,6 @@ class AddNotes extends StatefulWidget {
     return AddNotesState();
   }
 }
-
-
 class AddNotesState extends State<AddNotes> {
   List CourseData = [];
   List SubjectData= [];
