@@ -1,3 +1,4 @@
+import 'package:dreamclass/StudentFlow/studentprofile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,17 +78,8 @@ class StudentDashboardState extends State<StudentDashboard> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  // Navigator.push(context,MaterialPageRoute(builder: (context)=> profile())); // Close the drawer
+                   Navigator.push(context,MaterialPageRoute(builder: (context)=> ProfilePage())); // Close the drawer
                   // Navigate to a screen related to Option 1 if needed
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.upload, color: Colors.white),
-                title: const Text('Attendence Upload',
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context); // Close the drawer
-                  // Navigate to a screen related to Option 2 if needed
                 },
               ),
               ListTile(

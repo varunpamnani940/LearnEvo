@@ -5,12 +5,12 @@ import 'package:dreamclass/addnotes.dart';
 import 'package:dreamclass/addstudent.dart';
 import 'package:dreamclass/addsubject.dart';
 import 'package:dreamclass/profile.dart';
+import 'package:dreamclass/removestudent.dart';
 import 'package:dreamclass/transfer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-
 import 'Availablestudent.dart';
 import 'att.dart';
 import 'fees.dart';
@@ -75,15 +75,6 @@ class TeacherDashboardState extends State<TeacherDashboard> {
                 onTap: () {
                    Navigator.push(context,MaterialPageRoute(builder: (context)=> profile())); // Close the drawer
                   // Navigate to a screen related to Option 1 if needed
-                },
-              ),
-              ListTile(
-                leading: Icon(Icons.upload, color: Colors.white),
-                title: const Text('Attendence Upload',
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context); // Close the drawer
-                  // Navigate to a screen related to Option 2 if needed
                 },
               ),
               ListTile(
@@ -385,7 +376,9 @@ class ImageButtonHomeDeleteState extends State<ImageButtonHomeDelete>{
     return Container(
         child: Material(
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (BuildContext)=>Removestudent()));
+            },
             child: Column(
               children: [
                 Padding(

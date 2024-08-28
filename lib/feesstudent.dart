@@ -3,14 +3,10 @@ import 'package:dreamclass/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-
 import 'feesdetails.dart';
-
 class feesstud extends StatefulWidget {
   final String? CourseName;
-
   feesstud(this.CourseName);
-
   @override
   State<StatefulWidget> createState() {
     return feesstudstate(CourseName);
@@ -209,7 +205,7 @@ class feesstudstate extends State<feesstud> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), // Close dialog
+              onPressed: ()=>Navigator.pop(context, false),// Close dialog
               child: Text("Cancel"),
             ),
             TextButton(

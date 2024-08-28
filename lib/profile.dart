@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 class profile extends StatefulWidget {
   @override
   State<profile> createState() => _profileState();
@@ -26,7 +27,6 @@ class _profileState extends State<profile> {
                 color: Colors.blue[700],
                 child: InkWell(
                   onTap: () {
-
                   },
                   child: Icon(
                     Icons.arrow_circle_left_rounded,
@@ -38,7 +38,6 @@ class _profileState extends State<profile> {
             ),
           ),
         ),
-
         body:
         SingleChildScrollView(
           child: Stack(
