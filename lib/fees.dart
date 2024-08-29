@@ -16,7 +16,9 @@ class Fees extends StatefulWidget {
 class FeesState extends State<Fees> {
   List data = [];
   List<Map<String, dynamic>> courseTotalsList = [];
+  List<Map<String, dynamic>> filteredCourseTotalsList = [];
   Map<String, Map<String, int>> courseTotals = {};
+  TextEditingController _searchController = TextEditingController();
 
   Future<void> getData() async {
     String uri = "http://$ipAddress/flutter/getcoursefeesdata.php"; // Replace with your actual IP address or server
@@ -36,7 +38,7 @@ class FeesState extends State<Fees> {
             // Ensure conversion from String to int for discount, receivable fees, and received fees
             int discount = int.tryParse(student['dicount']) ?? 0;
             int receivableFees = int.tryParse(student['receiablefees']) ?? 0;
-            int receivedFees = int.tryParse(student['receivedfees']) ?? 0; // Correct key 'receivedfees'
+            int receivedFees = int.tryParse(student['receivedfees']) ?? 0;
 
             // If the course is already in the map, update the totals
             if (courseTotals.containsKey(courseName)) {
@@ -66,6 +68,9 @@ class FeesState extends State<Fees> {
             });
           });
 
+          // Initially, the filtered list will be the same as the full list
+          filteredCourseTotalsList = List.from(courseTotalsList);
+
           print(courseTotalsList);
         });
       } else {
@@ -80,6 +85,21 @@ class FeesState extends State<Fees> {
   void initState() {
     super.initState();
     getData();
+
+    // Add a listener to the search field
+    _searchController.addListener(() {
+      filterCourses();
+    });
+  }
+
+  void filterCourses() {
+    setState(() {
+      filteredCourseTotalsList = courseTotalsList.where((course) {
+        return course['courseName']
+            .toLowerCase()
+            .contains(_searchController.text.toLowerCase());
+      }).toList();
+    });
   }
 
   @override
@@ -107,25 +127,46 @@ class FeesState extends State<Fees> {
               ),
               child: Column(
                 children: [
+                  // Search Bar
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30,left: 30,right: 30,bottom: 10),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Search by Course Name',
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Course List
                   Expanded(
                     child: ListView.builder(
-                      padding: EdgeInsets.all(40),
+                      padding: EdgeInsets.only(left: 40,right: 40,bottom: 20),
                       shrinkWrap: true,
                       physics: BouncingScrollPhysics(),
-                      itemCount: courseTotalsList.length,
+                      itemCount: filteredCourseTotalsList.length,
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
                             onTap: () {
-                              print(courseTotalsList[index]["courseName"]);
-                              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>feesstud(courseTotalsList[index]["courseName"])));
+                              print(filteredCourseTotalsList[index]["courseName"]);
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      feesstud(filteredCourseTotalsList[index]["courseName"]),
+                                ),
+                              );
                             },
                             title: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  courseTotalsList[index]["courseName"],
+                                  filteredCourseTotalsList[index]["courseName"],
                                   style: TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.w700,
@@ -135,19 +176,19 @@ class FeesState extends State<Fees> {
                                 Row(
                                   children: [
                                     Text("Total Discount: "),
-                                    Text(courseTotalsList[index]["totalDiscount"].toString()),
+                                    Text(filteredCourseTotalsList[index]["totalDiscount"].toString()),
                                   ],
                                 ),
                                 Row(
                                   children: [
                                     Text("Total Receivable Fees: "),
-                                    Text(courseTotalsList[index]["totalReceivableFees"].toString()),
+                                    Text(filteredCourseTotalsList[index]["totalReceivableFees"].toString()),
                                   ],
                                 ),
                                 Row(
                                   children: [
                                     Text("Total Received Fees: "),
-                                    Text(courseTotalsList[index]["totalReceivedFees"].toString()),
+                                    Text(filteredCourseTotalsList[index]["totalReceivedFees"].toString()),
                                   ],
                                 ),
                               ],

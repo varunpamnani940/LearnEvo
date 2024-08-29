@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'feesdetails.dart';
+
 class feesstud extends StatefulWidget {
-  String? CourseName;
+  final String? CourseName;
 
   feesstud(this.CourseName);
 
@@ -15,25 +17,42 @@ class feesstud extends StatefulWidget {
   }
 }
 
-List student = [];
-
 class feesstudstate extends State<feesstud> {
   String? Coursename;
   TextEditingController _feesController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
+  TextEditingController _searchController = TextEditingController();
   String _selectedPaymentMode = "Cash"; // Default value for payment mode
   List<String> paymentModes = ["Cash", "Cheque", "Online"]; // List of payment modes
+  List student = [];
+  List filteredStudents = [];
 
   feesstudstate(this.Coursename);
+  String paidFees = "";
+  String paidDate = "";
+  String paymentMode = "";
 
   Future<void> getdata() async {
     String uri = "http://$ipAddress/flutter/getcoursefeesdata.php";
     var res = await http.post(Uri.parse(uri), body: {
       "coursename": Coursename
     });
+    final SharedPreferences sp = await SharedPreferences.getInstance();
     setState(() {
+      sp.setString("coursename", Coursename!);
       print(res.body);
       student = jsonDecode(res.body);
+      filteredStudents = student; // Initially show all students
+    });
+  }
+
+  Future<void> updatefees(int index) async {
+    String uri = "http://${ipAddress}/flutter/updatefees.php";
+    var res = await http.post(Uri.parse(uri), body: {
+      "receiableid": student[index]["receiableid"],
+      "date": paidDate,
+      "fees": paidFees,
+      "paymentmethod": paymentMode
     });
   }
 
@@ -41,68 +60,98 @@ class feesstudstate extends State<feesstud> {
   void initState() {
     super.initState();
     getdata();
+    _searchController.addListener(_filterStudents);
   }
-  void show(int index){
-    showDialog(context: context, builder: (context){
-      return AlertDialog(
-        title: Text("Choose option"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Material(
-                    color: Colors.blue[700],
-                    borderRadius: BorderRadius.circular(10),
-                    child: InkWell(
-                      onTap: (){
-                        showAddFeesDialog(index);
-                      },
-                      child: Container(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10,horizontal: 10),
-                            child:  Text("Add New" , style: TextStyle(
-                                color: Colors.white,fontWeight: FontWeight.w700,fontSize: 15
-                            ),),
-                          )
-                      ),
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0,horizontal: 10),
-                  child: Material(
-                    color: Colors.blue[700],
-                    borderRadius: BorderRadius.circular(10),
-                    child: InkWell(
-                      onTap: (){
 
-                      },
-                      child: Container(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                            child:  Text("Payment History" , style: TextStyle(
-                                color: Colors.white,fontWeight: FontWeight.w700,fontSize: 15
-                            ),),
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
-
-                          )
-                      ),
-                    ),
-                  ),
-                ),
-
-              ],
-            )
-          ],
-        )
-      );
+  void _filterStudents() {
+    setState(() {
+      filteredStudents = student
+          .where((s) => s["studentname"]
+          .toLowerCase()
+          .contains(_searchController.text.toLowerCase()))
+          .toList();
     });
   }
 
-  // Function to show the add fees dialog with improved error handling
+  void show(int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Choose option"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Material(
+                      color: Colors.blue[700],
+                      borderRadius: BorderRadius.circular(10),
+                      child: InkWell(
+                        onTap: () {
+                          showAddFeesDialog(index);
+                        },
+                        child: Container(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 10),
+                              child: Text(
+                                "Add New",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15),
+                              ),
+                            )),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 12.0, horizontal: 10),
+                    child: Material(
+                      color: Colors.blue[700],
+                      borderRadius: BorderRadius.circular(10),
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      feesdetail()));
+                        },
+                        child: Container(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 10, horizontal: 20),
+                              child: Text(
+                                "Payment History",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 15),
+                              ),
+                            )),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   void showAddFeesDialog(int index) {
     showDialog(
       context: context,
@@ -164,22 +213,14 @@ class feesstudstate extends State<feesstud> {
               child: Text("Cancel"),
             ),
             TextButton(
-              onPressed: () {
-                String paidFees = _feesController.text;
-                String paidDate = _dateController.text;
-                String paymentMode = _selectedPaymentMode;
-
-                print("Student ID: ${student[index]["receiableid"]}");
-                print("Paid Fees: $paidFees");
-                print("Date: $paidDate");
-                print("Payment Mode: $paymentMode");
-
-                // Reset the input fields
-
-
-                // Send data to server (implement your server API call here)
-                // ...
-
+              onPressed: () async {
+                setState(() {
+                  paidFees = _feesController.text;
+                  paidDate = _dateController.text;
+                  paymentMode = _selectedPaymentMode;
+                });
+                await updatefees(index);
+                await getdata();
                 Navigator.pop(context); // Close the dialog
               },
               child: Text("Submit"),
@@ -199,13 +240,13 @@ class feesstudstate extends State<feesstud> {
         body: Stack(
           children: [
             Container(
-              height: 400,
+              height: 100,
               alignment: Alignment.bottomCenter,
               decoration: BoxDecoration(color: Colors.blue[700]),
             ),
             Container(
               alignment: Alignment.bottomCenter,
-              height: 700,
+              height:700,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.only(
@@ -215,12 +256,25 @@ class feesstudstate extends State<feesstud> {
               ),
               child: Column(
                 children: [
+                  Padding(
+                    padding: EdgeInsets.only(top:40,left: 30,right: 30,bottom: 10 ),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        labelText: "Search by student name",
+                        prefixIcon: Icon(Icons.search),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ),
                   Expanded(
                     child: ListView.builder(
-                      padding: EdgeInsets.all(40),
+                      padding: EdgeInsets.only(top:10,left: 20,right: 20,bottom: 10 ),
                       shrinkWrap: true,
                       physics: BouncingScrollPhysics(),
-                      itemCount: student.length,
+                      itemCount: filteredStudents.length,
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
@@ -231,37 +285,45 @@ class feesstudstate extends State<feesstud> {
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  student[index]["studentname"],
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      filteredStudents[index]["studentname"],
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.only(left: 100),
+                                      child: Icon(
+                                        Icons.add,
+                                        size: 40,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 20),
                                 Row(
                                   children: [
                                     Text("Discount: "),
-                                    Text(student[index]["dicount"].toString()),
+                                    Text(filteredStudents[index]["dicount"]
+                                        .toString()),
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    Text("Recieable Fees: "),
-                                    Text(student[index]["receiablefees"]),
+                                    Text("Receivable Fees: "),
+                                    Text(filteredStudents[index]
+                                    ["receiablefees"]),
                                   ],
                                 ),
                                 Row(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     Text("Total Received Fees: "),
-                                    Text(student[index]["receivedfees"]),
-                                    Padding(
-                                      padding: EdgeInsets.only(left: 60),
-                                      child: Icon(
-                                        Icons.add,
-                                        size: 50,
-                                      ),
-                                    ),
+                                    Text(filteredStudents[index]
+                                    ["receivedfees"]),
                                   ],
                                 ),
                               ],

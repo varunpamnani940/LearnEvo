@@ -24,7 +24,7 @@ class LoginState extends State<Login> {
       setState(() {
         _isLoading = true; // Show the loader
       });
-
+      
       try {
         String? uri = "http://$ipAddress/flutter/login.php";
         var res = await http.post(Uri.parse(uri), body: {
@@ -223,3 +223,4 @@ class LoginState extends State<Login> {
     );
   }
 }
+
