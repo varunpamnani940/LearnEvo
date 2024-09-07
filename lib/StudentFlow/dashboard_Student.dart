@@ -1,3 +1,4 @@
+import 'package:dreamclass/StudentFlow/studentfees.dart';
 import 'package:dreamclass/StudentFlow/studentprofile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -23,13 +24,10 @@ class StudentDashboard extends StatefulWidget {
 }
 
 class StudentDashboardState extends State<StudentDashboard> {
-
-
-
   int _current_Index = 0;
   List<Widget> bottomNavigationBarItems = [
     Home(),
-    Icon(Icons.account_circle_rounded),
+    studentfees(),
   ];
   @override
 
@@ -154,15 +152,12 @@ class StudentDashboardState extends State<StudentDashboard> {
                           topLeft: Radius.circular(100),
                           topRight: Radius.circular(100)),
                     ),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 25),
-                        Container(
+                    child: Container(
                           child: bottomNavigationBarItems[_current_Index],
                         )
-                      ],
+
                     )),
-              ),
+
             ],
           ),
         ),
@@ -396,7 +391,6 @@ class ImageButtonLeaveState extends State<ImageButtonLeave>{
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: CircleAvatar(
-
                     child: Image.asset("assets/images/leave.png"),
                     radius: 55,
                   ),

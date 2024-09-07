@@ -99,10 +99,14 @@ Future<void> changestatus (a) async{
                     return ListTile(
                       leading: Material(
                         child: InkWell(
-                          onTap: (){
-                           setState(() {
+                          onTap: () async{
+
                              changestatus(CourseData[index]["courseid"]);
-                           });
+                             await getData();
+                             setState(() {
+                               getData();
+                             });
+
                           },
                           child:  Icon(Icons.delete),
                         ),

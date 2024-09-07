@@ -85,48 +85,43 @@ class CustomCalendar extends StatefulWidget {
 class _CustomCalendarState extends State<CustomCalendar> {
   DateTime _selectedDate = DateTime.now();
   DateTime _focusedDate = DateTime.now();
-  Future<void> getdata() async{
-    final SharedPreferences studentid  = await SharedPreferences.getInstance();
-    String uri = "http://${ipAddress}/flutter/StudentFlowapis/getattendence.php";
-    var res =  await http.post(Uri.parse(uri),body: {
-      "studentid":studentid.getString("studentid")
-    });
-    setState(() {
-      Map<String, dynamic> data = jsonDecode(res.body);
-      print(data);
-      setState(() {
-        Map<String, dynamic> data = jsonDecode(res.body);
-        data.forEach((key, value) {
-          DateTime date = DateTime.parse(key);
-          if (value == 'p') {
-            presentDates.add(DateTime(date.year, date.month, date.day));
-          } else if (value == 'a') {
-            absentDates.add(DateTime(date.year, date.month, date.day));
-          }
-        });
-      });
-
-    });
-  }
-
-  // Example lists for present and absent dates
   List<DateTime> presentDates = [];
-
   List<DateTime> absentDates = [];
-  List<DateTime> leaveDates = [
-    DateTime(2024,08,10),
-  ];
+  List<DateTime> leaveDates = [DateTime(2024, 08, 10)];
+
   @override
   void initState() {
     getdata();
     super.initState();
   }
+
+  Future<void> getdata() async {
+    final SharedPreferences studentid = await SharedPreferences.getInstance();
+    String uri = "http://${ipAddress}/flutter/StudentFlowapis/getattendence.php";
+    var res = await http.post(Uri.parse(uri), body: {
+      "studentid": studentid.getString("studentid")
+    });
+    setState(() {
+      Map<String, dynamic> data = jsonDecode(res.body);
+      print(data);
+      data.forEach((key, value) {
+        DateTime date = DateTime.parse(key);
+        if (value == 'p') {
+          presentDates.add(DateTime(date.year, date.month, date.day));
+        } else if (value == 'a') {
+          absentDates.add(DateTime(date.year, date.month, date.day));
+        }
+      });
+    });
+  }
+
   Widget build(BuildContext context) {
     return Column(
       children: [
         _buildHeader(),
         _buildDaysOfWeek(),
         _buildDateGrid(),
+        _buildStatistics(), // Add statistics widget here
       ],
     );
   }
@@ -208,9 +203,9 @@ class _CustomCalendarState extends State<CustomCalendar> {
           backgroundColor = Colors.green;
         } else if (absentDates.any((d) => isSameDate(d, date))) {
           backgroundColor = Colors.red;
-        }else if (leaveDates.any((d) => isSameDate(d, date))) {
-          backgroundColor = Colors.yellow;}
-        else {
+        } else if (leaveDates.any((d) => isSameDate(d, date))) {
+          backgroundColor = Colors.yellow;
+        } else {
           backgroundColor = _selectedDate == date ? Colors.blue : Colors.transparent;
         }
 
@@ -237,6 +232,42 @@ class _CustomCalendarState extends State<CustomCalendar> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildStatistics() {
+    final int presentCount = presentDates.where((d) => d.month == _focusedDate.month).length;
+    final int absentCount = absentDates.where((d) => d.month == _focusedDate.month).length;
+    final int leaveCount = leaveDates.where((d) => d.month == _focusedDate.month).length;
+
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildStatisticCard("Present", presentCount, Colors.green),
+          _buildStatisticCard("Absent", absentCount, Colors.red),
+          _buildStatisticCard("Leave", leaveCount, Colors.yellow),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatisticCard(String title, int count, Color color) {
+    return Container(
+      padding: EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(count.toString(), style: TextStyle(fontSize: 20)),
+        ],
+      ),
     );
   }
 

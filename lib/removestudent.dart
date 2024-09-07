@@ -76,13 +76,14 @@ class RemovestudentState extends State<Removestudent> {
   void show(int index) {
     showDialog(context: context, builder: (BuildContext) {
       return AlertDialog(
-        title: Text("Upload Attendence"),
+        title: Text("Delete Student"),
         content: Container(
-          height: 100,
+
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text("Are you Sure you want Delete the Student Records ",
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12),),
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),),
 
             ],
           ),
@@ -98,9 +99,8 @@ class RemovestudentState extends State<Removestudent> {
               await getstudentdata();
               await getData();
               filterStudents();
-              Navigator.pop(context); // Close the dialog
             },
-            child: Text("Submit"),
+            child: Text("Delete"),
           ),
         ],
       );

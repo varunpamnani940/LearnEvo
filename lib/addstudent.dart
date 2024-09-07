@@ -13,32 +13,33 @@ class AddStudent extends StatefulWidget {
 }
 
 class AddStudentState extends State<AddStudent> {
+  final _formKey = GlobalKey<FormState>();
+
   List collagedata = [];
   List CourseData = [];
   String? SelectedCollage;
   String? SelectedCourse;
-  TextEditingController name =TextEditingController();
+  TextEditingController name = TextEditingController();
   TextEditingController pno = TextEditingController();
   TextEditingController email = TextEditingController();
   TextEditingController adh = TextEditingController();
   TextEditingController ppno = TextEditingController();
   TextEditingController password = TextEditingController();
-  TextEditingController  cardid = TextEditingController();
-  TextEditingController  discount = TextEditingController();
+  TextEditingController cardid = TextEditingController();
+  TextEditingController discount = TextEditingController();
   List card = [];
   String Card_uid = "";
 
-  Future<void> getcard() async{
-    String  uri = "http://$ipAddress/flutter/studentcard.php";
+  Future<void> getcard() async {
+    String uri = "http://$ipAddress/flutter/studentcard.php";
     var res = await http.post(Uri.parse(uri));
     setState(() {
       card = jsonDecode(res.body);
-      Card_uid  = card[0];
+      Card_uid = card[0];
       print(Card_uid);
-
-
     });
   }
+
   Future<void> getcollageid() async {
     String uri = "http://$ipAddress/flutter/viewcollage.php";
     var res = await http.post(Uri.parse(uri), body: {});
@@ -57,32 +58,39 @@ class AddStudentState extends State<AddStudent> {
       print(CourseData);
     });
   }
-  Future<void> uploadData() async{
+
+  Future<void> uploadData() async {
     String uri = "http://$ipAddress/flutter/addstudent.php";
     print(SelectedCollage);
     print(SelectedCourse);
-    var res = await http.post(Uri.parse(uri),body: {
+    var res = await http.post(Uri.parse(uri), body: {
       "name": name.text,
-      "password":password.text,
+      "password": password.text,
       "pnumber": pno.text,
-      "email":email.text,
+      "email": email.text,
       "collageid": SelectedCollage,
-      "adcard":adh.text,
-      "ppno":ppno.text,
-      "coursename":SelectedCourse,
-      "card" : cardid.text,
-      "dicsount":discount.text
+      "adcard": adh.text,
+      "ppno": ppno.text,
+      "coursename": SelectedCourse,
+      "card": cardid.text,
+      "discount": discount.text
     });
-    // var response = jsonDecode(res.body);
-    // if(response["recordInserted"]=="true"){
-    //   var alert = AlertDialog(
-    //     content: Text("Student Recored Inserted"),
-    //   );
-    //   showDialog(context: context, builder: (BuildContext context){
-    //     return alert;
-    //   });
-    // }
     print(res.body);
+  }
+
+  void resetForm() {
+    name.clear();
+    pno.clear();
+    email.clear();
+    adh.clear();
+    ppno.clear();
+    password.clear();
+    cardid.clear();
+    discount.clear();
+    setState(() {
+      SelectedCollage = null;
+      SelectedCourse = null;
+    });
   }
 
   @override
@@ -96,7 +104,7 @@ class AddStudentState extends State<AddStudent> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: "Add Course",
+        title: "Add Student",
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             appBar: PreferredSize(
@@ -144,241 +152,312 @@ class AddStudentState extends State<AddStudent> {
                             topLeft: Radius.circular(80),
                             topRight: Radius.circular(80))),
                     child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          SizedBox(height: 20),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400)),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Name",
-                                prefixIcon: Icon(Icons.person_rounded),
-                              ),
-                              controller: name,
-                            ),
-                          ),
-
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                    BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400)),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Card UID",
-                                prefixIcon: Icon(Icons.person_rounded),
-                              ),
-                             readOnly: true,
-                              controller: cardid,
-                              onTap: (){
-                               setState(() {
-                                 getcard();
-                                 cardid.text = Card_uid;
-                               });
-                              },
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400)),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Phone Number",
-                                prefixIcon: Icon(Icons.contact_page_outlined),
-                              ),
-                              controller: pno,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400)),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Email",
-                                prefixIcon: Icon(Icons.email),
-                              ),
-                              controller: email,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey,width: 1),
-                                borderRadius: BorderRadius.circular(20)
-                              ),
-                              child: DropdownButton(
-                                underline: SizedBox(),
-                                value: SelectedCollage,
-
-                                hint: Text(
-                                  "Select Collage",
-                                  style: TextStyle(fontSize: 30),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            SizedBox(height: 20),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400)),
+                                  fillColor: Colors.grey.shade200,
+                                  filled: true,
+                                  hintText: "Name",
+                                  prefixIcon: Icon(Icons.person_rounded),
                                 ),
-                                icon: Icon(Icons.arrow_downward),
-                                iconSize: 24,
-                                elevation: 16,
-                                isExpanded: true,
-                                items: collagedata.map((e) {
-                                  return DropdownMenuItem(
-                                    child: Text(e['collagename']),
-                                    value: e['collageid'],
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
+                                controller: name,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a name';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400)),
+                                  fillColor: Colors.grey.shade200,
+                                  filled: true,
+                                  hintText: "Card UID",
+                                  prefixIcon: Icon(Icons.person_rounded),
+                                ),
+                                readOnly: true,
+                                controller: cardid,
+                                onTap: () {
                                   setState(() {
-                                    SelectedCollage = value.toString();
+                                    getcard();
+                                    cardid.text = Card_uid;
                                   });
                                 },
                               ),
-                            )
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                            child: Container(
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey,width: 1),
-                                borderRadius: BorderRadius.circular(20)
-                              ),
-                              child:  DropdownButton(
-                                value: SelectedCourse,
-                                isExpanded: true,
-                                underline: SizedBox(),
-                                itemHeight: 50,
-                                hint: Text(
-                                  "Select Course",
-                                  style: TextStyle(fontSize: 30),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400)),
+                                  fillColor: Colors.grey.shade200,
+                                  filled: true,
+                                  hintText: "Phone Number",
+                                  prefixIcon: Icon(Icons.contact_page_outlined),
                                 ),
-                                icon: Icon(Icons.arrow_downward),
-                                iconSize: 24,
-                                elevation: 16,
-                                items: CourseData.map((e) {
-                                  return DropdownMenuItem(
-                                    child: Text(e['coursename']),
-                                    value: e['courseid'],
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    SelectedCourse = value.toString();
-                                  });
+                                controller: pno,
+                                keyboardType: TextInputType.phone,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a phone number';
+                                  }
+                                  return null;
                                 },
                               ),
-                            )
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                    BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400)),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Adhar Card number",
-                                prefixIcon: Icon(Icons.confirmation_num_rounded),
-                              ),
-                              controller: adh,
                             ),
-
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                    BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400)),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Parent's Phone Number",
-                                prefixIcon: Icon(Icons.contact_page_outlined),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400)),
+                                  fillColor: Colors.grey.shade200,
+                                  filled: true,
+                                  hintText: "Email",
+                                  prefixIcon: Icon(Icons.email),
+                                ),
+                                controller: email,
+                                keyboardType: TextInputType.emailAddress,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter an email address';
+                                  }
+                                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                                    return 'Please enter a valid email address';
+                                  }
+                                  return null;
+                                },
                               ),
-                              controller: ppno,
                             ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 5),
-                            child: TextField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                    BorderSide(color: Colors.white)),
-                                focusedBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                        color: Colors.grey.shade400)),
-                                fillColor: Colors.grey.shade200,
-                                filled: true,
-                                hintText: "Dicount",
-                                prefixIcon: Icon(Icons.contact_page_outlined),
-                              ),
-                              controller: discount,
-                            ),
-                          ),
-                          SizedBox(height: 20,),
-                          Material(
-                            color: Colors.blue[700],
-                            borderRadius: BorderRadius.circular(10),
-                            child: InkWell(
-                              onTap: (){
-                                uploadData();
-                              },
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
                               child: Container(
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 20,horizontal: 120),
-                                    child:  Text("Add Student" , style: TextStyle(
-                                        color: Colors.white,fontWeight: FontWeight.w700,fontSize: 22
-                                    ),),
-
-                                  )
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey, width: 1),
+                                    borderRadius: BorderRadius.circular(20)
+                                ),
+                                child: DropdownButtonFormField(
+                                  value: SelectedCollage,
+                                  hint: Text(
+                                    "Select Collage",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  decoration: InputDecoration(
+                                    enabledBorder: InputBorder.none,
+                                      focusedBorder: InputBorder.none
+                                  ),
+                                  icon: Icon(Icons.arrow_downward),
+                                  iconSize: 24,
+                                  elevation: 16,
+                                  isExpanded: true,
+                                  items: collagedata.map((e) {
+                                    return DropdownMenuItem(
+                                      child: Text(e['collagename']),
+                                      value: e['collageid'],
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      SelectedCollage = value.toString();
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Please select a collage';
+                                    }
+                                    return null;
+                                  },
+                                ),
                               ),
                             ),
-                          ),
-                          SizedBox(height: 20,)
-                        ],
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 10),
+                              child: Container(
+                                padding: EdgeInsets.all(5),
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey, width: 1),
+                                    borderRadius: BorderRadius.circular(20)
+                                ),
+                                child: DropdownButtonFormField(
+                                  value: SelectedCourse,
+                                  isExpanded: true,
+
+                                  itemHeight: 50,
+                                  hint: Text(
+                                    "Select Course",
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                  icon: Icon(Icons.arrow_downward),
+                                  iconSize: 24,
+                                  elevation: 0,
+                                  decoration: InputDecoration(
+
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none
+                                  ),
+                                  items: CourseData.map((e) {
+                                    return DropdownMenuItem(
+                                      child: Text(e['coursename']),
+                                      value: e['courseid'],
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      SelectedCourse = value.toString();
+                                    });
+                                  },
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Please select a course';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400)),
+                                  fillColor: Colors.grey.shade200,
+                                  filled: true,
+                                  hintText: "Adhar Card number",
+                                  prefixIcon: Icon(Icons.confirmation_num_rounded),
+                                ),
+                                controller: adh,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter Adhar Card number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400)),
+                                  fillColor: Colors.grey.shade200,
+                                  filled: true,
+                                  hintText: "Parent's Phone Number",
+                                  prefixIcon: Icon(Icons.contact_page_outlined),
+                                ),
+                                controller: ppno,
+                                keyboardType: TextInputType.phone,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter parent\'s phone number';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(color: Colors.white)),
+                                  focusedBorder: OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.grey.shade400)),
+                                  fillColor: Colors.grey.shade200,
+                                  filled: true,
+                                  hintText: "Discount",
+                                  prefixIcon: Icon(Icons.contact_page_outlined),
+                                ),
+                                controller: discount,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter a discount';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Material(
+                              color: Colors.blue[700],
+                              borderRadius: BorderRadius.circular(10),
+                              child: InkWell(
+                                onTap: () {
+                                  if (_formKey.currentState?.validate() ?? false) {
+                                    uploadData();
+                                    var alert = AlertDialog(
+                                      content: Text("Student Added"),
+                                    );
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return alert;
+                                        }).then((_) {
+                                      resetForm();
+                                    });
+                                  }
+                                },
+                                child: Container(
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: 20, horizontal: 120),
+                                      child: Text(
+                                        "Add Student",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            fontSize: 22),
+                                      ),
+                                    )),
+                              ),
+                            ),
+                            SizedBox(height: 20)
+                          ],
+                        ),
                       ),
                     )),
               ],

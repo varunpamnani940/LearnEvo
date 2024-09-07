@@ -141,7 +141,6 @@ class FeesState extends State<Fees> {
                       ),
                     ),
                   ),
-                  // Course List
                   Expanded(
                     child: ListView.builder(
                       padding: EdgeInsets.only(left: 40,right: 40,bottom: 20),
@@ -153,7 +152,7 @@ class FeesState extends State<Fees> {
                           child: ListTile(
                             onTap: () {
                               print(filteredCourseTotalsList[index]["courseName"]);
-                              Navigator.pushReplacement(
+                              Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (BuildContext context) =>

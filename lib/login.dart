@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'StudentFlow/dashboard_Student.dart';
 import 'dashboard_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-String ipAddress = '192.168.66.112';
+String ipAddress = '192.168.125.112';
 class Login extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -39,7 +39,7 @@ class LoginState extends State<Login> {
           sp.setString("teacher", email.text);
           print("done");
           setState(() {
-            Navigator.push(context,
+            Navigator.pushReplacement(context,
                 MaterialPageRoute(builder: (context) => TeacherDashboard()));
           });
         } else if (response['student'] == "true") {
