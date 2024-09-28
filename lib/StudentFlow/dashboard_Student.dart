@@ -53,6 +53,7 @@ class StudentDashboardState extends State<StudentDashboard> {
                     child: Container(
                       child: Column(
                         children: [
+
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
@@ -125,6 +126,7 @@ class StudentDashboardState extends State<StudentDashboard> {
         body: SafeArea(
           child: Stack(
             children: [
+
               Container(
                 width: 500,
                 height: 100,
@@ -200,6 +202,7 @@ class HomeState extends State<Home> {
           child: Container(
             child: Column(
               children: [
+                SizedBox(height: 30,),
                 Text(
                   "“Memory is the treasury and guardian of all things.”",
                   style: TextStyle(fontWeight: FontWeight.w700),
