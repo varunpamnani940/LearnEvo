@@ -5,7 +5,7 @@ import 'StudentFlow/dashboard_Student.dart';
 import 'dashboard_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String ipAddress = '192.168.228.112';
+String ipAddress = '192.168.188.164';
 
 class Login extends StatefulWidget {
   @override
@@ -39,27 +39,16 @@ class LoginState extends State<Login> {
         if (response['admin'] == "true") {
           final SharedPreferences sp = await SharedPreferences.getInstance();
           sp.setString("teacher", email.text);
-          setState(() {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => TeacherDashboard()));
-          });
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => TeacherDashboard()));
         } else if (response['student'] == "true") {
           final SharedPreferences sp = await SharedPreferences.getInstance();
           sp.setString("email", email.text);
           getstudentid();
-          setState(() {
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => StudentDashboard()));
-          });
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => StudentDashboard()));
         } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                content: Text("Login ID or Password is incorrect"),
-              );
-            },
-          );
+          _showErrorDialog("Login ID or Password is incorrect");
         }
       } catch (e) {
         print(e);
@@ -70,9 +59,10 @@ class LoginState extends State<Login> {
       }
     }
   }
-  Future<void> otp(email) async{
-    String uri = "http://localhost/flutter/passwordreset.php";
-    var res = await http.post(Uri.parse(uri),body:{
+
+  Future<void> otp(String email) async {
+    String uri = "http://$ipAddress/flutter/passwordreset.php";
+    var res = await http.post(Uri.parse(uri), body: {
       "email": email
     });
     print(jsonDecode(res.body));
@@ -88,6 +78,36 @@ class LoginState extends State<Login> {
     setState(() {
       sp.setString("studentid", res.body);
     });
+  }
+
+  Future<void>pass(var pwd) async
+  {
+    String uri="";
+    var res= await http.post(Uri.parse(uri),
+        body: {
+          "pwd": pwd
+        }
+    );
+    print(jsonDecode(res.body));
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("OK"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _showForgotPasswordDialog() {
@@ -117,11 +137,12 @@ class LoginState extends State<Login> {
               onPressed: () {
                 String email = emailController.text.trim();
                 if (email.isNotEmpty) {
-                  // Implement your password reset logic here (e.g., API call)
-                  otp(email);
-                  // Close the dialog
+                  otp(email).then((_) {
+                    Navigator.of(context).pop(); // Close the email input dialog
+                    _showOtpDialog(email); // Show OTP dialog
+                  });
                 } else {
-                  print("Please enter a valid email address");
+                  _showErrorDialog("Please enter a valid email address");
                 }
               },
               child: Text("Send Reset Link"),
@@ -131,6 +152,105 @@ class LoginState extends State<Login> {
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: Text("Cancel"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showOtpDialog(String email) {
+    TextEditingController otpController = TextEditingController();
+    TextEditingController newPasswordController = TextEditingController();
+    TextEditingController confirmPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Enter OTP and New Password"),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text("Please enter the OTP sent to $email."),
+                SizedBox(height: 10),
+                TextField(
+                  controller: otpController,
+                  decoration: InputDecoration(
+                    hintText: "OTP",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: newPasswordController,
+                  decoration: InputDecoration(
+                    hintText: "New Password",
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
+                ),
+                SizedBox(height: 10),
+                TextField(
+                  controller: confirmPasswordController,
+                  decoration: InputDecoration(
+                    hintText: "Confirm Password",
+                    border: OutlineInputBorder(),
+                  ),
+                  obscureText: true,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                String otp = otpController.text.trim();
+                String newPassword = newPasswordController.text.trim();
+                String confirmPassword = confirmPasswordController.text.trim();
+
+                if (otp.isNotEmpty && newPassword.isNotEmpty && confirmPassword.isNotEmpty) {
+                  if (newPassword == confirmPassword) {
+                    // Here, add your OTP verification and password update logic
+                    print("OTP entered: $otp");
+                    print("New Password: $newPassword");
+                    // Call API to reset password
+                    _showSuccessDialog("Password reset successfully!");
+                    Navigator.of(context).pop(); // Close the OTP dialog
+                  } else {
+                    _showErrorDialog("Passwords do not match!");
+                  }
+                } else {
+                  _showErrorDialog("Please fill in all fields!");
+                }
+              },
+              child: Text("Reset Password"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("OK"),
             ),
           ],
         );
