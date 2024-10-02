@@ -6,6 +6,8 @@ import 'package:dreamclass/addstudent.dart';
 import 'package:dreamclass/addsubject.dart';
 import 'package:dreamclass/profile.dart';
 import 'package:dreamclass/removestudent.dart';
+import 'package:dreamclass/resultUpload.dart';
+import 'package:dreamclass/stats.dart';
 import 'package:dreamclass/transfer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -73,7 +75,7 @@ class TeacherDashboardState extends State<TeacherDashboard> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                   Navigator.push(context,MaterialPageRoute(builder: (context)=> profile())); // Close the drawer
+                   Navigator.push(context,MaterialPageRoute(builder: (context)=> ProfilePage())); // Close the drawer
                   // Navigate to a screen related to Option 1 if needed
                 },
               ),
@@ -488,7 +490,9 @@ class ImageButtonHomePerformanceState extends State<ImageButtonHomePerfomance>{
     return Container(
         child: Material(
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>StudentStatisticsPage()) );
+            },
             child: Column(
               children: [
                 Padding(
@@ -598,7 +602,7 @@ class ImageButtonResultstate extends State<ImageButtonResult>{
         child: Material(
           child: InkWell(
             onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context)=> Addsubject()));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=> ResultsUploadPage()));
             },
             child: Column(
               children: [
