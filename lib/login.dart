@@ -5,7 +5,7 @@ import 'StudentFlow/dashboard_Student.dart';
 import 'dashboard_teacher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String ipAddress = '192.168.188.164';
+String ipAddress = '192.168.61.112';
 
 class Login extends StatefulWidget {
   @override
@@ -16,6 +16,7 @@ class Login extends StatefulWidget {
 
 class LoginState extends State<Login> {
   bool _isLoading = false; // Loading state variable
+  bool _isSendingOtp = false;
   final _formKey = GlobalKey<FormState>(); // Form key for validation
 
   TextEditingController email = TextEditingController();
@@ -59,14 +60,19 @@ class LoginState extends State<Login> {
       }
     }
   }
-
-  Future<void> otp(String email) async {
+  late var otp_ ;
+  late var Otp ;
+  Future<Map<String, dynamic>>  otp(String email) async {
     String uri = "http://$ipAddress/flutter/passwordreset.php";
     var res = await http.post(Uri.parse(uri), body: {
       "email": email
     });
-    print(jsonDecode(res.body));
+    otp_ = jsonDecode(res.body);
+    Otp = otp_["otp"];
+    print(Otp);
+  return jsonDecode(res.body); // Return the response for verification
   }
+
 
   Future<void> getstudentid() async {
     String uri = "http://$ipAddress/flutter/StudentFlowapis/getstudentid.php";
@@ -80,15 +86,17 @@ class LoginState extends State<Login> {
     });
   }
 
-  Future<void>pass(var pwd) async
+  Future<void> pass(String  pwd,String email) async
   {
-    String uri="";
+    String uri="http://$ipAddress/flutter/Update_password.php";
     var res= await http.post(Uri.parse(uri),
         body: {
-          "pwd": pwd
+          "password": pwd,
+          "email":email
         }
     );
     print(jsonDecode(res.body));
+    var response = jsonDecode(res.body);
   }
 
   void _showErrorDialog(String message) {
@@ -130,17 +138,31 @@ class LoginState extends State<Login> {
                   border: OutlineInputBorder(),
                 ),
               ),
+              if (_isSendingOtp) // Show progress indicator if sending OTP
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: CircularProgressIndicator(),
+                ),
             ],
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 String email = emailController.text.trim();
                 if (email.isNotEmpty) {
-                  otp(email).then((_) {
+                  setState(() {
+                    _isSendingOtp = true; // Start loading
+                  });
+                  var response = await otp(email); // Await OTP sending
+                  setState(() {
+                    _isSendingOtp = false; // Stop loading
+                  });
+                  if (response['status'] == "success") {
                     Navigator.of(context).pop(); // Close the email input dialog
                     _showOtpDialog(email); // Show OTP dialog
-                  });
+                  } else {
+                    _showErrorDialog("Failed to send OTP. Please try again.");
+                  }
                 } else {
                   _showErrorDialog("Please enter a valid email address");
                 }
@@ -163,6 +185,7 @@ class LoginState extends State<Login> {
     TextEditingController otpController = TextEditingController();
     TextEditingController newPasswordController = TextEditingController();
     TextEditingController confirmPasswordController = TextEditingController();
+    bool _isVerifyingOtp = false; // State for verifying OTP
 
     showDialog(
       context: context,
@@ -200,24 +223,47 @@ class LoginState extends State<Login> {
                   ),
                   obscureText: true,
                 ),
+                if (_isVerifyingOtp) // Show progress indicator if verifying OTP
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: CircularProgressIndicator(),
+                  ),
               ],
             ),
           ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: () async {
                 String otp = otpController.text.trim();
                 String newPassword = newPasswordController.text.trim();
                 String confirmPassword = confirmPasswordController.text.trim();
 
                 if (otp.isNotEmpty && newPassword.isNotEmpty && confirmPassword.isNotEmpty) {
                   if (newPassword == confirmPassword) {
-                    // Here, add your OTP verification and password update logic
-                    print("OTP entered: $otp");
-                    print("New Password: $newPassword");
-                    // Call API to reset password
-                    _showSuccessDialog("Password reset successfully!");
-                    Navigator.of(context).pop(); // Close the OTP dialog
+                    setState(() {
+                      _isVerifyingOtp = true; // Start loading for verification
+                    });
+
+                    // Here, you should call an API to verify the OTP
+                    // For now, let's simulate it:
+                    await Future.delayed(Duration(seconds: 2)); // Simulate network delay
+                    print(Otp);
+                    print(otp);
+                    // Simulated OTP verification logic
+                    if (otp == Otp.toString()) { // Replace with actual OTP verification
+                      // Call API to reset password here if needed
+
+
+                       await pass( newPassword,email);
+                       _showSuccessDialog("Password reset successfully!");
+                       // Close the OTP dialog
+                    } else {
+                      _showErrorDialog("Invalid OTP!");
+                    }
+
+                    setState(() {
+                      _isVerifyingOtp = false; // Stop loading
+                    });
                   } else {
                     _showErrorDialog("Passwords do not match!");
                   }
@@ -238,7 +284,6 @@ class LoginState extends State<Login> {
       },
     );
   }
-
   void _showSuccessDialog(String message) {
     showDialog(
       context: context,
