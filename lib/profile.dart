@@ -22,6 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     setState(() {
       data = jsonDecode(res.body);
+
     });
   }
 
