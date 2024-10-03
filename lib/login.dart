@@ -42,7 +42,11 @@ class LoginState extends State<Login> {
           sp.setString("teacher", email.text);
           Navigator.push(context,
               MaterialPageRoute(builder: (context) => TeacherDashboard()));
-        } else if (response['student'] == "true") {
+        }
+        else if (response['status'] == "success"){
+          _OtpVerficationDialog(response);
+        }
+        else if (response['student'] == "true") {
           final SharedPreferences sp = await SharedPreferences.getInstance();
           sp.setString("email", email.text);
           getstudentid();
@@ -180,6 +184,59 @@ class LoginState extends State<Login> {
       },
     );
   }
+  void _OtpVerficationDialog(var res) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        TextEditingController emailController = TextEditingController();
+
+        return AlertDialog(
+          title: Text("Dual Factor Authentication OTP"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Enter Your OTP."),
+              SizedBox(height: 10),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  hintText: "OTP",
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              if (_isSendingOtp) // Show progress indicator if sending OTP
+                Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: CircularProgressIndicator(),
+                ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                  print(res["otp"]);
+                  if (res['otp'].toString() == emailController.text) {
+                    final SharedPreferences sp = await SharedPreferences.getInstance();
+                    sp.setString("teacher", email.text);
+                    print(sp.getString("teacher"));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => TeacherDashboard()));
+                  }
+              },
+              child: Text("Check OTP"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   void _showOtpDialog(String email) {
     TextEditingController otpController = TextEditingController();
