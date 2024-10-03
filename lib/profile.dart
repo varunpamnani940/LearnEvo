@@ -1,14 +1,35 @@
+import 'dart:convert';
+import 'package:dreamclass/login.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
-
+List data = [] ;
+late String name;
 class _ProfilePageState extends State<ProfilePage> {
   bool _is2FAEnabled = false;
 
+  Future<void> getdata() async{
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    String uri= "http://$ipAddress/flutter/profile_get_data.php";
+    var res = await http.post(Uri.parse(uri),body: {
+      "email":sp.getString("teacher"),
+    });
+
+    setState(() {
+      data = jsonDecode(res.body);
+    });
+  }
+
   @override
+  void initState() {
+    getdata() ;// TODO: implement initState
+    super.initState();
+  }
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -83,19 +104,19 @@ class _ProfilePageState extends State<ProfilePage> {
       children: [
         CircleAvatar(
           radius: 40,
-          backgroundImage: AssetImage('assets/profile_pic.png'), // Add your profile image path
+         // Add your profile image path
         ),
         SizedBox(width: 20),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "John Doe", // Can be dynamic if needed
+              data[0]["name"],
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5),
             Text(
-              "johndoe@example.com", // Can be dynamic if needed
+              data[0]["email"], // Can be dynamic if needed
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ],
@@ -235,12 +256,15 @@ class _EditPersonalInfoPageState extends State<EditPersonalInfoPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  Future<void> update() async{
+
+  }
   @override
   void initState() {
     super.initState();
     // Pre-populate fields with existing data (replace with actual data from the backend)
-    _nameController.text = "John Doe";
-    _emailController.text = "johndoe@example.com";
+    _nameController.text = data[0]["name"];
+    _emailController.text = data[0]["email"];
   }
 
   @override
