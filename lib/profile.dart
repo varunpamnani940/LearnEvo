@@ -8,39 +8,40 @@ class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
-List data = [] ;
-late String name;
+
+List data = [];
+bool _is2FAEnabled = false; // Default value to prevent LateInitializationError
+
 class _ProfilePageState extends State<ProfilePage> {
-  bool _is2FAEnabled = false;
-
-  Future<void> getdata() async{
+  Future<void> getdata() async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
-    String uri= "http://$ipAddress/flutter/profile_get_data.php";
-    var res = await http.post(Uri.parse(uri),body: {
-      "email":sp.getString("teacher"),
+    String uri = "http://$ipAddress/flutter/profile_get_data.php";
+    var res = await http.post(Uri.parse(uri), body: {
+      "email": sp.getString("teacher"),
     });
-
     setState(() {
       data = jsonDecode(res.body);
+      print(data);
+      // Initialize _is2FAEnabled based on API response
+      _is2FAEnabled = data.isNotEmpty && data[0]["auth"] == "1";
     });
   }
 
   @override
   void initState() {
-    getdata() ;// TODO: implement initState
     super.initState();
+    getdata(); // Fetch data on initialization
   }
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
         actions: [
           IconButton(
-            icon: Icon(Icons.settings),
-            onPressed: () {
-              // Navigate to settings or additional actions
-            },
-          )
+            icon: Icon(Icons.arrow_circle_down),
+            onPressed: getdata,
+          ),
         ],
       ),
       body: Padding(
@@ -48,47 +49,33 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Profile Header
             _buildProfileHeader(),
-
             SizedBox(height: 20),
-
-            // Edit Personal Information Button
             Text(
               "Personal Information",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
             _buildEditPersonalInfoButton(),
-
             SizedBox(height: 20),
-
-            // Dual-Factor Authentication Settings
             Text(
               "Security Settings",
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10),
-
             _build2FAToggle(),
-
-            // Change Password Setting
             ListTile(
               leading: Icon(Icons.lock),
               title: Text("Change Password"),
-              onTap: () {
+              onTap: (){
+                otp();
                 _showChangePasswordDialog();
               },
             ),
-
             Spacer(),
-
-            // Save Button
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                  _saveSettings();
-                },
+                onPressed: _saveSettings,
                 child: Text('Save Changes'),
               ),
             ),
@@ -97,26 +84,36 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+  Future<Map<String, dynamic>>  otp() async {
+    String uri = "http://$ipAddress/flutter/passwordreset.php";
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    var res = await http.post(Uri.parse(uri), body: {
+      "email": sp.getString("teacher")
+    });
+    otp_ = jsonDecode(res.body);
+    Otp = otp_["otp"];
+    print(Otp);
+    return jsonDecode(res.body); // Return the response for verification
+  }
 
-  // Profile header with picture and name
   Widget _buildProfileHeader() {
     return Row(
       children: [
         CircleAvatar(
           radius: 40,
-         // Add your profile image path
+          // Add your profile image path
         ),
         SizedBox(width: 20),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              data[0]["name"],
+              data.isNotEmpty ? data[0]["name"] : '',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 5),
             Text(
-              data[0]["email"], // Can be dynamic if needed
+              data.isNotEmpty ? data[0]["email"] : '',
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
           ],
@@ -125,14 +122,12 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Button for editing personal information
   Widget _buildEditPersonalInfoButton() {
     return ListTile(
       leading: Icon(Icons.edit),
       title: Text('Edit Personal Information'),
       trailing: Icon(Icons.arrow_forward_ios),
       onTap: () {
-        // Navigate to the Edit Personal Information screen
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => EditPersonalInfoPage()),
@@ -141,7 +136,6 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Dual-Factor Authentication Toggle
   Widget _build2FAToggle() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -156,14 +150,46 @@ class _ProfilePageState extends State<ProfilePage> {
             setState(() {
               _is2FAEnabled = value;
             });
+            _updateAuth(value);
           },
         ),
       ],
     );
   }
 
-  // Function to show the Change Password dialog
+  Future<void> _updateAuth(bool enable) async {
+    String uri = "http://$ipAddress/flutter/update_auth.php";
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    var res = await http.post(Uri.parse(uri), body: {
+      "email": sp.getString("teacher"),
+      "status": enable ? "1" : "0",
+    });
+    print(res.body);
+    if (res.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Authentication settings updated!')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update settings.')),
+      );
+    }
+  }
+  late var otp_ ;
+  late var Otp ;
   void _showChangePasswordDialog() {
+
+    Future<void> pass(String  pwd,String email) async {
+      String uri="http://$ipAddress/flutter/Update_password.php";
+      var res= await http.post(Uri.parse(uri),
+          body: {
+            "password": pwd,
+            "email":email
+          }
+      );
+      print(jsonDecode(res.body));
+      var response = jsonDecode(res.body);
+    }
     TextEditingController otpController = TextEditingController();
     TextEditingController newPasswordController = TextEditingController();
     TextEditingController confirmPasswordController = TextEditingController();
@@ -215,17 +241,16 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  // Save settings (including 2FA)
   void _saveSettings() {
-    // Logic for saving settings
+    // Save the current state of 2FA
+    _updateAuth(_is2FAEnabled);
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Profile updated successfully!')),
     );
   }
 
-  // Function to handle password change
-  void _changePassword(
-      String otp, String newPassword, String confirmPassword) {
+  void _changePassword(String otp, String newPassword, String confirmPassword) {
     if (otp.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please enter the OTP.')),
@@ -239,6 +264,8 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       return;
     }
+
+    // Call your API to change the password here
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Password changed successfully!')),
@@ -256,22 +283,22 @@ class _EditPersonalInfoPageState extends State<EditPersonalInfoPage> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
-  Future<void> update() async{
-
+  Future<void> update() async {
+    String uri = "http://$ipAddress/flutter/profile_update.php";
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    var res = await http.post(Uri.parse(uri), body: {
+      "oldemail": sp.getString("teacher"),
+      "newname": _nameController.text,
+      "newemail": _emailController.text
+    });
+    print(res.body);
   }
+
   @override
   void initState() {
     super.initState();
-    // Pre-populate fields with existing data (replace with actual data from the backend)
-    _nameController.text = data[0]["name"];
-    _emailController.text = data[0]["email"];
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    super.dispose();
+    _nameController.text = data.isNotEmpty ? data[0]["name"] : '';
+    _emailController.text = data.isNotEmpty ? data[0]["email"] : '';
   }
 
   @override
@@ -296,6 +323,7 @@ class _EditPersonalInfoPageState extends State<EditPersonalInfoPage> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
+                update();
                 _savePersonalInfo();
               },
               child: Text('Save'),
@@ -306,15 +334,25 @@ class _EditPersonalInfoPageState extends State<EditPersonalInfoPage> {
     );
   }
 
-  void _savePersonalInfo() {
-    String name = _nameController.text;
-    String email = _emailController.text;
-
-    // Add logic to save these details to your backend
-
+  void _savePersonalInfo() async {
+    // Logic to save these details to your backend
+    await getdata();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Personal information updated!')),
     );
-    Navigator.of(context).pop();
+  }
+
+  Future<void> getdata() async {
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    String uri = "http://$ipAddress/flutter/profile_get_data.php";
+    var res = await http.post(Uri.parse(uri), body: {
+      "email": sp.getString("teacher"),
+    });
+
+    setState(() {
+      data = jsonDecode(res.body);
+      print(data);
+      Navigator.of(context).pop();
+    });
   }
 }
