@@ -1,12 +1,13 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'StudentFlow/dashboard_Student.dart';
-import 'dashboard_teacher.dart';
+import 'admin/dashboard_admin.dart';
+import 'admin/dashboard_teacher.dart';
 import 'login.dart';
 String? studid;
 String? tid;
+String? tt;
 void main() => runApp(MyApp());
 class MyApp extends StatelessWidget {
   @override
@@ -32,28 +33,38 @@ class _MyHomePageState extends State<MyHomePage> {
     final SharedPreferences studentid  = await SharedPreferences.getInstance();
     String? studentsid;
     String? teacherids;
+    String? teach;
     final SharedPreferences  teacherid = await SharedPreferences.getInstance();
-    studentsid = studentid.getString("studentid");
+    studentsid = studentid.getString("email");
     teacherids = studentid.getString("teacher");
+    teach = studentid.getString("emailt");
     setState(() {
       studid = studentsid;
       tid = teacherids;
+      tt = teach;
+      print(studid);
+      print(studid);
+      print(tt);
     });
   }
   void initState() {
     super.initState();
     Timer(Duration(milliseconds: 1),
             ()=>getsudentid().whenComplete(() async{
-            if(studid==null && tid ==null){
+            if(studid==null && tid ==null && tt==null){
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>GetStarted()));
             }
-            else if(studid == null){
+            else if(tt != null){
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>TeacherDashboard()));
+            }
+            else if(studid == null){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>admin_dashboard()));
             }
             else if(tid==null){
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (BuildContext context)=>StudentDashboard()));
 
             }
+
             }),
     );
   }

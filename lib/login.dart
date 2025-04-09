@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'StudentFlow/dashboard_Student.dart';
-import 'dashboard_teacher.dart';
+import 'admin/dashboard_admin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-String ipAddress = '192.168.9.112';
+import 'admin/dashboard_teacher.dart';
+
+String ipAddress = '51.20.10.147';
 
 class Login extends StatefulWidget {
   @override
@@ -30,7 +32,7 @@ class LoginState extends State<Login> {
 
       try {
         String uri = "http://$ipAddress/flutter/login.php";
-        var res = await http.post(Uri.parse(uri), body: {
+        var res = await http.post(Uri.parse(uri),  headers: {'Access-Control-Allow-Origin': '*'}, body: {
           "name": email.text,
           "pwd": password.text,
         });
@@ -40,8 +42,8 @@ class LoginState extends State<Login> {
         if (response['admin'] == "true") {
           final SharedPreferences sp = await SharedPreferences.getInstance();
           sp.setString("teacher", email.text);
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => TeacherDashboard()));
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => admin_dashboard()));
         }
         else if (response['status'] == "success"){
           _OtpVerficationDialog(response);
@@ -50,9 +52,17 @@ class LoginState extends State<Login> {
           final SharedPreferences sp = await SharedPreferences.getInstance();
           sp.setString("email", email.text);
           getstudentid();
-          Navigator.push(context,
+          Navigator.pushReplacement(context,
               MaterialPageRoute(builder: (context) => StudentDashboard()));
-        } else {
+        }
+        else if (response['teacher'] == "true") {
+          final SharedPreferences sp = await SharedPreferences.getInstance();
+          sp.setString("emailt", email.text);
+          getstudentid();
+          Navigator.pushReplacement(context,
+              MaterialPageRoute(builder: (context) => TeacherDashboard()));
+        }
+        else {
           _showErrorDialog("Login ID or Password is incorrect");
         }
       } catch (e) {
@@ -71,6 +81,7 @@ class LoginState extends State<Login> {
     var res = await http.post(Uri.parse(uri), body: {
       "email": email
     });
+    print(res.body);
     otp_ = jsonDecode(res.body);
     Otp = otp_["otp"];
     print(Otp);
@@ -85,6 +96,7 @@ class LoginState extends State<Login> {
     var res = await http.post(Uri.parse(uri), body: {
       "studentemail": sp.getString("email")
     });
+    print(res.body);
     setState(() {
       sp.setString("studentid", res.body);
     });
@@ -98,6 +110,7 @@ class LoginState extends State<Login> {
           "email":email
         }
     );
+    print(res.body);
     print(jsonDecode(res.body));
     var response = jsonDecode(res.body);
   }
@@ -219,7 +232,7 @@ class LoginState extends State<Login> {
                     sp.setString("teacher", email.text);
                     print(sp.getString("teacher"));
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => TeacherDashboard()));
+                        MaterialPageRoute(builder: (context) => admin_dashboard()));
                   }
               },
               child: Text("Check OTP"),

@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'dashboard_teacher.dart';
+import 'dashboard_admin.dart';
 import 'EditStudent.dart';
-import 'login.dart';
+import '../login.dart';
 
 class Transfer extends StatefulWidget {
   @override
@@ -175,7 +175,7 @@ class TransferState extends State<Transfer> {
                 child: InkWell(
                   onTap: () {
                     Navigator.pop(context, MaterialPageRoute(
-                        builder: (context) => TeacherDashboard()));
+                        builder: (context) => admin_dashboard()));
                   },
                   child: Icon(
                     Icons.arrow_circle_left_rounded,
@@ -279,12 +279,29 @@ class TransferState extends State<Transfer> {
                       itemBuilder: (context, index) {
                         int studentId = int.parse(filteredStudents[index]['studentid'].toString());
                         bool isChecked = !uncheckedStudents.containsKey(studentId);
+                     // Extract student ID
+                        String imageUrl = "http://$ipAddress/flutter/studentimage/$studentId.jpg"; // Construct URL
 
                         return Padding(
                           padding: EdgeInsets.all(5.0),
                           child: ListTile(
                             tileColor: Colors.white,
-                            leading: CircleAvatar(),
+                            leading: CircleAvatar(
+                              radius: 25,
+                              backgroundColor: Colors.grey[300], // Placeholder background color
+                              child: ClipOval(
+                                child: FadeInImage.assetNetwork(
+                                  placeholder: 'assets/images/loading_2.gif', // Local loading animation
+                                  image: "http://$ipAddress/flutter/studentimage/${filteredStudents[index]["studentid"]}.jpg",
+                                  fit: BoxFit.cover,
+                                  width: 50,
+                                  height: 50,
+                                  imageErrorBuilder: (context, error, stackTrace) {
+                                    return Icon(Icons.person, size: 40, color: Colors.grey); // Default icon on error
+                                  },
+                                ),
+                              ),
+                            ),
                             trailing: Checkbox(
                               value: isChecked,
                               onChanged: (bool? value) {

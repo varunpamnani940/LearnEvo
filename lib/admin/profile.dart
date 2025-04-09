@@ -1,18 +1,39 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:dreamclass/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../main.dart';
+
 class ProfilePage extends StatefulWidget {
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
+String? formattedEmail;
+String teacherEmail = "";
 
 List data = [];
 bool _is2FAEnabled = false; // Default value to prevent LateInitializationError
 
 class _ProfilePageState extends State<ProfilePage> {
+  Future<void> loadTeacherData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+
+
+    setState(() {
+      teacherEmail = prefs.getString('teacher') ?? "No Email Found";
+      if (teacherEmail.endsWith("@gmail.com")) {
+        formattedEmail  = teacherEmail.replaceAll("@gmail.com", "gmail").replaceAll('.', '_');
+        String imageUrl = "http://13.60.85.45/flutter/admin_image/$formattedEmail.jpg";
+        print(imageUrl);
+      } else {
+        print("Not a Gmail user, skipping...");
+      }
+
+    });
+  }
   Future<void> getdata() async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
     String uri = "http://$ipAddress/flutter/profile_get_data.php";
@@ -30,7 +51,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
-    getdata(); // Fetch data on initialization
+    getdata();
+    loadTeacherData();// Fetch data on initialization
   }
 
   Widget build(BuildContext context) {
@@ -39,8 +61,10 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Text('Profile'),
         actions: [
           IconButton(
-            icon: Icon(Icons.arrow_circle_down),
-            onPressed: getdata,
+            icon: Icon(Icons.refresh_outlined,size: 50,),
+            onPressed: (){
+              getdata();
+            },
           ),
         ],
       ),
@@ -101,7 +125,19 @@ class _ProfilePageState extends State<ProfilePage> {
       children: [
         CircleAvatar(
           radius: 40,
-          // Add your profile image path
+          backgroundColor: Colors.grey[300], // Placeholder background color
+          child: ClipOval(
+            child: FadeInImage.assetNetwork(
+              placeholder: 'assets/images/loading_2.gif', // Local loading animation
+              image: "http://$ipAddress/flutter/admin_image/$formattedEmail.jpg",
+              fit: BoxFit.cover,
+              width: 80,
+              height: 80,
+              imageErrorBuilder: (context, error, stackTrace) {
+                return Icon(Icons.person, size: 40, color: Colors.grey); // Default icon on error
+              },
+            ),
+          ),
         ),
         SizedBox(width: 20),
         Column(
@@ -114,7 +150,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 5),
             Text(
               data.isNotEmpty ? data[0]["email"] : '',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
           ],
         ),
@@ -177,26 +213,27 @@ class _ProfilePageState extends State<ProfilePage> {
   }
   late var otp_ ;
   late var Otp ;
+  Future<void> pass(String  pwd,String email) async {
+    String uri="http://$ipAddress/flutter/Update_password.php";
+    var res= await http.post(Uri.parse(uri),
+        body: {
+          "password": pwd,
+          "email":email
+        }
+    );
+    print(jsonDecode(res.body));
+    var response = jsonDecode(res.body);
+  }
   void _showChangePasswordDialog() {
 
-    Future<void> pass(String  pwd,String email) async {
-      String uri="http://$ipAddress/flutter/Update_password.php";
-      var res= await http.post(Uri.parse(uri),
-          body: {
-            "password": pwd,
-            "email":email
-          }
-      );
-      print(jsonDecode(res.body));
-      var response = jsonDecode(res.body);
-    }
+
     TextEditingController otpController = TextEditingController();
     TextEditingController newPasswordController = TextEditingController();
     TextEditingController confirmPasswordController = TextEditingController();
 
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           title: Text('Change Password'),
           content: Column(
@@ -230,7 +267,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             ElevatedButton(
               onPressed: () {
-                _changePassword(otpController.text, newPasswordController.text,
+                _changePassword(dialogContext,otpController.text, newPasswordController.text,
                     confirmPasswordController.text);
               },
               child: Text('Confirm'),
@@ -250,7 +287,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void _changePassword(String otp, String newPassword, String confirmPassword) {
+  Future<void> _changePassword (BuildContext dialogContext,String otp, String newPassword, String confirmPassword) async{
     if (otp.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please enter the OTP.')),
@@ -264,13 +301,13 @@ class _ProfilePageState extends State<ProfilePage> {
       );
       return;
     }
-
-    // Call your API to change the password here
+    final SharedPreferences sp = await SharedPreferences.getInstance();
+    pass( newPassword, sp.getString("teacher").toString());
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Password changed successfully!')),
     );
-    Navigator.of(context).pop();
+    Navigator.of(dialogContext).pop();
   }
 }
 
@@ -292,6 +329,11 @@ class _EditPersonalInfoPageState extends State<EditPersonalInfoPage> {
       "newemail": _emailController.text
     });
     print(res.body);
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    prefs.setString("teacher",_emailController.text );
+
   }
 
   @override

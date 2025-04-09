@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'dashboard_teacher.dart';
+import 'dashboard_admin.dart';
 import 'EditStudent.dart';
-import 'login.dart';
+import '../login.dart';
 
 class Removestudent extends StatefulWidget {
   @override
@@ -20,6 +20,7 @@ class RemovestudentState extends State<Removestudent> {
   String selectedYear = 'All Years';
   String selectedDepartment = 'All Departments';
   String searchQuery = '';
+  bool isLoading = true;
 
   Future<void> getData() async {
     try {
@@ -36,6 +37,16 @@ class RemovestudentState extends State<Removestudent> {
     } catch (e) {
       print(e);
     }
+  }
+
+  Future<void> fetchAllData() async {
+    await Future.wait([
+      getData(),
+      getstudentdata(),
+    ]);
+    setState(() {
+      isLoading = false; // Mark loading as complete
+    });
   }
 
   Future<void> getstudentdata() async {
@@ -70,11 +81,13 @@ class RemovestudentState extends State<Removestudent> {
     String uri = "http://$ipAddress/flutter/deletestudent.php";
     var res = await http.post(Uri.parse(uri), body: {
       "studentid": filteredStudents[index]["studentid"],
+      "courseid": filteredStudents[index]["courseid"],
     });
   }
 
   void show(int index) {
-    showDialog(context: context, builder: (BuildContext) {
+
+    showDialog(context: context, builder: (dialogContext) {
       return AlertDialog(
         title: Text("Delete Student"),
         content: Container(
@@ -90,7 +103,7 @@ class RemovestudentState extends State<Removestudent> {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context), // Close dialog
+            onPressed: () => Navigator.pop(dialogContext), // Close dialog
             child: Text("Cancel"),
           ),
           TextButton(
@@ -99,7 +112,8 @@ class RemovestudentState extends State<Removestudent> {
               await getstudentdata();
               await getData();
               filterStudents();
-            },
+              Navigator.pop(dialogContext);       },
+
             child: Text("Delete"),
           ),
         ],
@@ -110,8 +124,10 @@ class RemovestudentState extends State<Removestudent> {
   @override
   void initState() {
     super.initState();
+    fetchAllData();
     getstudentdata();
     getData();
+
   }
 
 
@@ -138,8 +154,8 @@ class RemovestudentState extends State<Removestudent> {
                 color: Colors.blue[700],
                 child: InkWell(
                   onTap: () {
-                    Navigator.pop(context, MaterialPageRoute(
-                        builder: (context) => TeacherDashboard()));
+                    Navigator.push(context, MaterialPageRoute(
+                        builder: (context) => admin_dashboard()));
                   },
                   child: Icon(
                     Icons.arrow_circle_left_rounded,
@@ -151,7 +167,9 @@ class RemovestudentState extends State<Removestudent> {
             ),
           ),
         ),
-        body: SingleChildScrollView(
+        body: isLoading
+            ? Center(child: CircularProgressIndicator()) // Show loader
+            : SingleChildScrollView(
           child: Stack(
             children: [
               Container(
@@ -262,7 +280,22 @@ class RemovestudentState extends State<Removestudent> {
                             padding: EdgeInsets.all(5.0),
                             child: ListTile(
                               tileColor: Colors.white,
-                              leading: CircleAvatar(),
+                              leading: CircleAvatar(
+                                radius: 25,
+                                backgroundColor: Colors.grey[300], // Placeholder background color
+                                child: ClipOval(
+                                  child: FadeInImage.assetNetwork(
+                                    placeholder: 'assets/images/loading_2.gif', // Local loading animation
+                                    image: "http://$ipAddress/flutter/studentimage/${filteredStudents[index]["studentid"]}.jpg",
+                                    fit: BoxFit.cover,
+                                    width: 50,
+                                    height: 50,
+                                    imageErrorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons.person, size: 40, color: Colors.grey); // Default icon on error
+                                    },
+                                  ),
+                                ),
+                              ),
                               trailing: Material(
                                 child: InkWell(
                                   child: Icon(

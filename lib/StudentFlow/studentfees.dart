@@ -2,6 +2,11 @@ import 'dart:convert';
 import 'package:dreamclass/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import "package:pdf/pdf.dart";
+import 'package:pdf/widgets.dart' as pw;
+import 'package:open_file/open_file.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class studentfees extends StatefulWidget {
   @override
@@ -17,17 +22,129 @@ class studentfeesState extends State<studentfees> {
   Map<String, Map<String, int>> courseTotals = {};
   TextEditingController _searchController = TextEditingController();
 
+  Future<void> generateReceipt(String courseName, int totalDiscount, int totalReceivableFees, int totalReceivedFees) async {
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return pw.Container(
+            padding: pw.EdgeInsets.all(20),
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                // Header: Institute Name
+                pw.Center(
+                  child: pw.Text(
+                    "LearnEvo  Academy",
+                    style: pw.TextStyle(fontSize: 24, fontWeight: pw.FontWeight.bold),
+                  ),
+                ),
+                pw.Divider(),
+
+                // Receipt Title
+                pw.Center(
+                  child: pw.Text(
+                    "FEE RECEIPT",
+                    style: pw.TextStyle(fontSize: 18, fontWeight: pw.FontWeight.bold, color: PdfColors.blue),
+                  ),
+                ),
+                pw.SizedBox(height: 20),
+
+                // Student & Course Details
+                pw.Text("Course Name: $courseName", style: pw.TextStyle(fontSize: 14)),
+                pw.Text("Receipt Date: ${DateTime.now().toLocal()}"),
+                pw.SizedBox(height: 10),
+
+                // Fee Breakdown Table
+                pw.Table(
+                  border: pw.TableBorder.all(color: PdfColors.black),
+                  children: [
+                    pw.TableRow(
+                      decoration: pw.BoxDecoration(color: PdfColors.grey200),
+                      children: [
+                        pw.Padding(
+                          padding: pw.EdgeInsets.all(8),
+                          child: pw.Text("Description", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        ),
+                        pw.Padding(
+                          padding: pw.EdgeInsets.all(8),
+                          child: pw.Text("Amount", style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                    tableRow("Total Fees", totalReceivableFees),
+                    tableRow("Discount", totalDiscount),
+                    tableRow("Amount Paid", totalReceivedFees),
+                    tableRow("Pending Fees", totalReceivableFees - totalReceivedFees),
+                  ],
+                ),
+
+                pw.SizedBox(height: 30),
+
+                // Signature Section
+                pw.Row(
+                  mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                  children: [
+                    pw.Text("Authorized Signatory", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                    pw.Text("Student Signature", style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold)),
+                  ],
+                ),
+
+                pw.SizedBox(height: 10),
+                pw.Divider(),
+
+                // Footer
+                pw.Center(
+                  child: pw.Text(
+                    "Thank you for your payment!",
+                    style: pw.TextStyle(fontSize: 14, fontWeight: pw.FontWeight.bold, color: PdfColors.green),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+
+    final output = await getExternalStorageDirectory();
+    final file = File("${output!.path}/$courseName-Receipt.pdf");
+
+    await file.writeAsBytes(await pdf.save());
+
+    OpenFile.open(file.path);
+  }
+
+// Helper Function to Create Table Rows
+  pw.TableRow tableRow(String title, int amount) {
+    return pw.TableRow(
+      children: [
+        pw.Padding(
+          padding: pw.EdgeInsets.all(8),
+          child: pw.Text(title),
+        ),
+        pw.Padding(
+          padding: pw.EdgeInsets.all(8),
+          child: pw.Text("₹ $amount"),
+        ),
+      ],
+    );
+  }
   Future<void> getData() async {
     final SharedPreferences sp = await SharedPreferences.getInstance();
-    String uri = "http://$ipAddress/flutter/StudentFlowapis/getfeesdata.php"; // Replace with your actual IP address or server
+    String uri = "http://$ipAddress/flutter/studentflowapis/getfeesdata.php"; // Replace with your actual IP address or server
     try {
       var res = await http.post(Uri.parse(uri),body: {
         "studentid": sp.getString("studentid")
       });
       if (res.statusCode == 200) {
+        print("ss");
         setState(() {
           print(res.body);
           data = jsonDecode(res.body);
+          print(data);
 
           // Clear the list and map before recalculating
           courseTotalsList.clear();
@@ -184,6 +301,18 @@ class studentfeesState extends State<studentfees> {
                                     Text("Total Paid Fees: "),
                                     Text(filteredCourseTotalsList[index]["totalReceivedFees"].toString()),
                                   ],
+                                ),
+                                ElevatedButton.icon(
+                                  onPressed: () {
+                                    generateReceipt(
+                                      filteredCourseTotalsList[index]["courseName"],
+                                      filteredCourseTotalsList[index]["totalDiscount"],
+                                      filteredCourseTotalsList[index]["totalReceivableFees"],
+                                      filteredCourseTotalsList[index]["totalReceivedFees"],
+                                    );
+                                  },
+                                  icon: Icon(Icons.download),
+                                  label: Text("Download Receipt"),
                                 ),
                               ],
                             ),

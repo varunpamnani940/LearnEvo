@@ -14,6 +14,7 @@ class Fees extends StatefulWidget {
 }
 
 class FeesState extends State<Fees> {
+
   List data = [];
   List<Map<String, dynamic>> courseTotalsList = [];
   List<Map<String, dynamic>> filteredCourseTotalsList = [];
@@ -150,7 +151,9 @@ class FeesState extends State<Fees> {
                       itemBuilder: (context, index) {
                         return Card(
                           child: ListTile(
-                            onTap: () {
+                            onTap: () async{
+                              final SharedPreferences sp = await SharedPreferences.getInstance();
+                              sp.setString("course_name", filteredCourseTotalsList[index]["courseName"]);
                               print(filteredCourseTotalsList[index]["courseName"]);
                               Navigator.push(
                                 context,

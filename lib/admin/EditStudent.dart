@@ -1,7 +1,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'dashboard_teacher.dart';
+import 'dashboard_admin.dart';
 import 'package:http/http.dart' as http;
 
 class Editstudent extends StatefulWidget {
@@ -69,7 +69,7 @@ class _EditstudentState extends State<Editstudent> {
                     Navigator.pop(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => TeacherDashboard()));
+                            builder: (context) => admin_dashboard()));
                   },
                   child: Icon(
                     Icons.arrow_circle_left_rounded,

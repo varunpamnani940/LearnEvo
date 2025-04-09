@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import 'dashboard_teacher.dart';
+import 'dashboard_admin.dart';
 class IotAttupload extends StatefulWidget{
   String? courseid;
 
@@ -66,7 +66,7 @@ class IotAttuploadState extends State<IotAttupload>{
                         Navigator.pop(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => TeacherDashboard()));
+                                builder: (context) => admin_dashboard()));
                       },
                       child: Icon(
                         Icons.arrow_circle_left_rounded,

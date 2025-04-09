@@ -4,12 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:http/http.dart' as http;
 
-import '../Availablestudent.dart';
+import '../admin/Availablestudent.dart';
 import '../login.dart';
 import '../main.dart';
 import 'atten.dart';
 import 'coursedetails.dart';
+import 'leaveapp.dart';
+import 'marks.dart';
+import 'meeting.dart';
+import 'notes.dart';
 
 
 String? studid ;
@@ -30,10 +35,26 @@ class StudentDashboardState extends State<StudentDashboard> {
     studentfees(),
   ];
   @override
+  Future<void> getstudentid() async{
+    String uri  = "http://$ipAddress/flutter/studentflowapis/getstudentid.php";
+    final SharedPreferences studentid = await SharedPreferences.getInstance();
+    var res = await  http.post(Uri.parse(uri),body: {
+      "studentemail" :studentid.getString("email")
+    });
+    print(res.body);
+    setState(() {
+      studid = studentid.getString("studentid");
+      studentid.setString("studentid", res.body);
+      print(studentid.getString("studentid"));
+      print(res.body);
+    });
+
+  }
 
   @override
   void initState() {
     super.initState();
+    getstudentid();
 
     // super.initState();
   }
@@ -58,9 +79,21 @@ class StudentDashboardState extends State<StudentDashboard> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               CircleAvatar(
-                                backgroundColor: Colors.blue,
-                                radius: 60,
-                              )
+                                radius: 25,
+                                backgroundColor: Colors.grey[300], // Placeholder background color
+                                child: ClipOval(
+                                  child: FadeInImage.assetNetwork(
+                                    placeholder: 'assets/images/loading_2.gif', // Local loading animation
+                                    image: "http://$ipAddress/flutter/studentimage/${studid}.jpg",
+                                    fit: BoxFit.cover,
+                                    width: 50,
+                                    height: 50,
+                                    imageErrorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons.person, size: 40, color: Colors.grey); // Default icon on error
+                                    },
+                                  ),
+                                ),
+                              ),
                             ],
                           )
                         ],
@@ -77,19 +110,11 @@ class StudentDashboardState extends State<StudentDashboard> {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                   Navigator.push(context,MaterialPageRoute(builder: (context)=> ProfilePage())); // Close the drawer
+                   Navigator.push(context,MaterialPageRoute(builder: (context)=> StudentProfilePage())); // Close the drawer
                   // Navigate to a screen related to Option 1 if needed
                 },
               ),
-              ListTile(
-                leading: Icon(Icons.time_to_leave_rounded, color: Colors.white),
-                title: const Text("Leave Application",
-                    style: TextStyle(color: Colors.white)),
-                onTap: () {
-                  Navigator.pop(context); // Close the drawer
-                  // Navigate to a screen related to Option 1 if needed
-                },
-              ),
+
               ListTile(
                 leading: Icon(
                   Icons.logout,
@@ -99,7 +124,9 @@ class StudentDashboardState extends State<StudentDashboard> {
                     style: TextStyle(color: Colors.white)),
                 onTap: ()  async {
                   final  SharedPreferences Logut =  await SharedPreferences.getInstance();
-                  Logut.remove("studentid");
+                  Logut.remove("teacher");
+                  Logut.remove("emailt");
+                  Logut.remove("email");
                   Navigator.push(context, MaterialPageRoute(builder: (BuildContext context)=>MyApp()));
 
                 },
@@ -388,7 +415,9 @@ class ImageButtonLeaveState extends State<ImageButtonLeave>{
     return Container(
         child: Material(
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder:(context)=>LeaveApp() ));
+            },
             child: Column(
               children: [
                 Padding(
@@ -424,7 +453,7 @@ class ImageButtonHomeNotesState extends State<ImageButtonHomeNotes>{
         child: Material(
           child: InkWell(
             onTap: () {
-            //  Navigator.push(context, MaterialPageRoute(builder: (context)=>AddNotes()));
+            Navigator.push(context, MaterialPageRoute(builder: (context)=>Notes()));
             },
             child: Column(
               children: [
@@ -461,7 +490,7 @@ class ImageButtonHomeAddState extends State<ImageButtonHomeAdd>{
         child: Material(
           child: InkWell(
             onTap: () {
-             // Navigator.push(context, MaterialPageRoute(builder: (context)=>AddCourse()));
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>MarksPage()));
             },
             child: Column(
               children: [
@@ -469,12 +498,12 @@ class ImageButtonHomeAddState extends State<ImageButtonHomeAdd>{
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: CircleAvatar(
 
-                    child: Image.asset("assets/images/question.png"),
+                    child: Image.asset("assets/images/result.png"),
                     radius: 55,
                   ),
                 ),
                 Text(
-                  "Question Paper",
+                  "Result ",
                   style: TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 17),
                 )
@@ -497,19 +526,22 @@ class ImageButtonHomePerformanceState extends State<ImageButtonHomePerfomance>{
     return Container(
         child: Material(
           child: InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>TeacherMeetingScreen()));
+
+            },
             child: Column(
               children: [
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
                   child: CircleAvatar(
 
-                    child: Image.asset("assets/images/report.png"),
+                    child: Image.asset("assets/images/meeting.png"),
                     radius: 55,
                   ),
                 ),
                 Text(
-                  "Student Report",
+                  "Teacher Meeting",
                   style: TextStyle(
                       fontWeight: FontWeight.w700, fontSize: 17),
                 )

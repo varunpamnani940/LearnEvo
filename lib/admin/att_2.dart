@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'login.dart';
+import '../login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'att.dart';
-import 'dashboard_teacher.dart';
+import 'dashboard_admin.dart';
 
 class att_2 extends StatefulWidget {
   String? Courseid ;
@@ -52,7 +52,7 @@ class att_2State extends State<att_2> {
   Codec<String, String> stringToBase64 = utf8.fuse(base64);
   Future<void> uploadAttendence () async{
 
-    String  uri = "http://$ipAddress/flutter/uploadattendence.php";
+    String  uri = "http://$ipAddress/flutter/Uploadattendence.php";
     var res = await http.post(Uri.parse(uri), body: {
      "absentarray":encoded_absentids,
       "studentdata":encoded_studentis,

@@ -117,12 +117,16 @@ class feesstudstate extends State<feesstud> {
                       color: Colors.blue[700],
                       borderRadius: BorderRadius.circular(10),
                       child: InkWell(
-                        onTap: () {
+                        onTap: () async {
+                          final SharedPreferences sp = await SharedPreferences.getInstance();
+                          sp.setString("student_id",filteredStudents[index ]['studentid']);
+                          sp.setString("student_name",filteredStudents[index ]['studentname']);
+                          print(filteredStudents[index ]['studentid']);
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (BuildContext context) =>
-                                      feesdetail()));
+                                      FeesHistoryScreen()));
                         },
                         child: Container(
                             child: Padding(

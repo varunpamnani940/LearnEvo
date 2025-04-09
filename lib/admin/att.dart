@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'att_2.dart';
-import 'dashboard_teacher.dart';
+import 'dashboard_admin.dart';
 import 'machine_Att_upload.dart';
-import 'login.dart';
+import '../login.dart';
 
 class att extends StatefulWidget {
   @override
@@ -64,7 +64,7 @@ class attState extends State<att> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => TeacherDashboard()));
+                            builder: (context) => admin_dashboard()));
                   },
                   child: Icon(
                     Icons.arrow_circle_left_rounded,
@@ -155,73 +155,7 @@ class attState extends State<att> {
                                 ),
                               ),
                               onTap: (){
-
-                                var alert = new AlertDialog(
-                                  title: Text("Upload Attendence"),
-                                  content: Container(
-                                    height: 100,
-                                    child: Column(
-                                      children: [
-                                        Text("Select Mode For attendence Upload",style: TextStyle(fontWeight: FontWeight.w700,fontSize: 15),),
-                                        Row(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                              child: Material(
-                                                color: Colors.blue[700],
-                                                borderRadius: BorderRadius.circular(10),
-                                                child: InkWell(
-                                                  onTap: (){
-
-                                                    Navigator.push(context, MaterialPageRoute(builder: (context) =>  IotAttupload(selectitem)));
-
-                                                  },
-                                                  child: Container(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                                                        child:  Text("Automated" , style: TextStyle(
-                                                            color: Colors.white,fontWeight: FontWeight.w700,fontSize: 15
-                                                        ),),
-
-                                                      )
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 12.0,horizontal: 20),
-                                              child: Material(
-                                                color: Colors.blue[700],
-                                                borderRadius: BorderRadius.circular(10),
-                                                child: InkWell(
-                                                  onTap: (){
-
-                                                    Navigator.push(context, MaterialPageRoute(builder: (context) => att_2(selectitem,DateController.text)));
-
-                                                  },
-                                                  child: Container(
-                                                      child: Padding(
-                                                        padding: EdgeInsets.symmetric(vertical: 10,horizontal: 20),
-                                                        child:  Text("Manual" , style: TextStyle(
-                                                            color: Colors.white,fontWeight: FontWeight.w700,fontSize: 15
-                                                        ),),
-
-
-                                                      )
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                );
-                                showDialog(context: context, builder: (BuildContext context) {
-                                  return alert;
-                                });
+                                Navigator.push(context, MaterialPageRoute(builder: (context) => att_2(selectitem,DateController.text)));
                               },
                             ),
                           ),
